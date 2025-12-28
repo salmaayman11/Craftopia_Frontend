@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiPost } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { User, Heart, ShoppingCart } from 'lucide-react';
 
@@ -20,10 +20,7 @@ const Login = () => {
     setSuccessMessage('');
 
     try {
-      const { data } = await axios.post(
-        'http://localhost:3000/auth/login',
-        { email, password }
-      );
+      const data = await apiPost('/auth/login', { email, password });
       login(data.token);
       setSuccessMessage('Login successful!');
       if (data.role === 'artist') {
@@ -35,12 +32,13 @@ const Login = () => {
       }
     } catch (err) {
       console.error(err);
-      if (err.response?.status === 403) {
+      // Check status code from error message or use a different approach
+      if (err.message && err.message.includes('403')) {
         setPopupMessage("Your account has been banned. You will not be able to sign in.");
         setShowPopup(true);
         setTimeout(() => setShowPopup(false), 4000);
       } else {
-        setError(err.response?.data?.message || 'Login failed');
+        setError(err.message || 'Login failed');
       }
     }
   };

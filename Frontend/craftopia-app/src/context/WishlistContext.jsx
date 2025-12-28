@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { apiGet, apiPost, apiDelete } from "../api/api";
 
 const WishlistContext = createContext();
 
@@ -20,21 +20,17 @@ export const WishlistProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      fetchWishlist(token);
+      fetchWishlist();
     } else {
       setWishlist([]);
     }
   }, [token]);
 
-  const fetchWishlist = async (authToken) => {
+  const fetchWishlist = async () => {
   try {
-    const res = await axios.get("http://localhost:3000/wishlist/mywishlist", {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
+    const res = await apiGet("/wishlist/mywishlist");
 
-    const items = res.data.wishlistItems.map((item) => {
+    const items = res.wishlistItems.map((item) => {
       const product = item.product;
       return {
         ...product,
@@ -56,11 +52,7 @@ export const WishlistProvider = ({ children }) => {
 
   const addToWishlist = async (product) => {
   try {
-    await axios.post(`http://localhost:3000/wishlist/add/${product.id}`, null, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    await apiPost(`/wishlist/add/${product.id}`, null);
 
     const normalizedProduct = {
       ...product,
@@ -74,7 +66,7 @@ export const WishlistProvider = ({ children }) => {
 
     setWishlist((prev) => [...prev, normalizedProduct]);
   } catch (error) {
-    if (error.response?.data?.message === "Product already in wishlist") {
+    if (error.message && error.message.includes("already in wishlist")) {
       console.warn("Already in wishlist.");
     } else {
       console.error("Failed to add to wishlist:", error);
@@ -85,17 +77,9 @@ export const WishlistProvider = ({ children }) => {
 
   const removeFromWishlist = async (productId) => {
   try {
-    const res = await axios.delete(`http://localhost:3000/wishlist/remove/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    await apiDelete(`/wishlist/remove/${productId}`);
 
-    if (res.status === 200) {
-      setWishlist((prev) => prev.filter((item) => item.id !== productId));
-    } else {
-      console.warn("Unexpected response when removing from wishlist:", res);
-    }
+    setWishlist((prev) => prev.filter((item) => item.id !== productId));
   } catch (error) {
     console.error("Failed to remove from wishlist:", error);
   }

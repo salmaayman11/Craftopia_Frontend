@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiPost } from '../api/api';
 import {toast} from 'react-hot-toast';
 const ESCROW_FEE = 0;
 
@@ -21,19 +21,15 @@ const CartOverview = ({ cartItems }) => {
     const productIds = cartItems.map(item => item.id);
     const quantity = cartItems.map(item => item.cartQuantity);
 
-    const response = await axios.post('http://localhost:3000/order/placeOrder', {
+    const response = await apiPost('/order/placeOrder', {
       productIds,
       quantity
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
     });
 
-    console.log('✅ Order placed successfully:', response.data);
+    console.log('✅ Order placed successfully:', response);
     navigate('/orders');
   } catch (error) {
-    console.error('❌ Error placing order:', error.response?.data || error.message);
+    console.error('❌ Error placing order:', error.message);
     toast.error('Failed to place order. Please try again.');
   } finally {
     setLoading(false);

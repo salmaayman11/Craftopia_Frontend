@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiGet, apiPost, apiPut } from '../api/api';
 import {
     FiPackage,
     FiTruck,
@@ -28,12 +28,8 @@ const MyOrders = () => {
         const fetchOrders = async () => {
             try {
                 setIsLoading(true);
-                const response = await axios.get('http://localhost:3000/order/myOrders', {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                const sortedOrders = response.data.orders.sort(
+                const response = await apiGet('/order/myOrders');
+                const sortedOrders = response.orders.sort(
                     (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
                 );
                 setOrders(sortedOrders);
@@ -67,11 +63,7 @@ const MyOrders = () => {
             const confirmed = window.confirm("Are you sure you want to cancel this order?");
             if (!confirmed) return;
 
-            await axios.put(`http://localhost:3000/order/cancel/${orderId}`, {}, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            await apiPut(`/order/cancel/${orderId}`, {});
 
             setOrders(prevOrders =>
                 prevOrders.map(order =>
@@ -126,18 +118,9 @@ const MyOrders = () => {
         }
 
         try {
-            const response = await axios.post(
-                'http://localhost:3000/review/create',
-                reviewData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            const response = await apiPost('/review/create', reviewData);
 
-            if (response.status === 201) {
+            if (response) {
                 toast.success('Thank you for your review!');
                 setOrders(prevOrders =>
                     prevOrders.map(order => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiGet, apiPost } from '../api/api';
 import { toast } from 'react-hot-toast';
 
 const AdminProfile = () => {
@@ -14,14 +14,10 @@ const AdminProfile = () => {
     const fetchProfile = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('http://localhost:3000/admin/profile', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            const response = await apiGet('/admin/profile');
 
-            if (response.data && response.data.admin) {
-                const { name, username, phone } = response.data.admin;
+            if (response && response.admin) {
+                const { name, username, phone } = response.admin;
                 setProfile({
                     name: name || '',
                     username: username || '',
@@ -44,11 +40,7 @@ const AdminProfile = () => {
 
     const handleSubmit = async () => {
         try {
-            await axios.post('http://localhost:3000/admin/profile/update', profile, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            await apiPost('/admin/profile/update', profile);
             toast.success('Profile updated successfully!');
             setIsEditing(false);
             fetchProfile();

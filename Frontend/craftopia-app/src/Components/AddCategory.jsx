@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PlusCircle, Tag } from "lucide-react";
+import { apiGet, apiPost } from "../api/api";
 
 const AddCategory = () => {
   const [name, setName] = useState("");
@@ -20,8 +21,7 @@ const AddCategory = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:3000/category/all");
-        const data = await res.json();
+        const data = await apiGet("/category/all");
         setCategories(data.categories || []);
       } catch (err) {
         console.error("Failed to fetch categories:", err.message);
@@ -50,25 +50,11 @@ const AddCategory = () => {
     setMessage("");
 
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3000/category/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: trimmedName }),
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        setMessage(result.message || "Failed to add category.");
-      } else {
-        setMessage("Category added successfully!");
-        setName("");
-      }
-    } catch {
-      setMessage("Server error, please try again later.");
+      await apiPost("/category/create", { name: trimmedName });
+      setMessage("Category added successfully!");
+      setName("");
+    } catch (err) {
+      setMessage(err.message || "Server error, please try again later.");
     } finally {
       setLoading(false);
     }

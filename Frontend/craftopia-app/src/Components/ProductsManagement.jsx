@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiGet, apiDelete } from "../api/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTrashAlt } from "react-icons/fa";
 
@@ -11,11 +11,8 @@ const ProductsManagement = () => {
 
     const fetchProducts = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await axios.get("http://localhost:3000/product/get", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const normalProducts = res.data.products.filter(
+            const res = await apiGet("/product/get");
+            const normalProducts = res.products.filter(
                 (p) => p.type === "normal"
             );
             setProducts(normalProducts);
@@ -38,15 +35,7 @@ const ProductsManagement = () => {
     const handleDelete = async () => {
         if (!selectedProduct) return;
         try {
-            const token = localStorage.getItem("token");
-            console.log("Token used for deletion:", token);
-
-            await axios.delete(
-                `http://localhost:3000/product/delete/${selectedProduct.productId}`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            await apiDelete(`/product/delete/${selectedProduct.productId}`);
             setProducts((prev) =>
                 prev.filter((p) => p.productId !== selectedProduct.productId)
             );

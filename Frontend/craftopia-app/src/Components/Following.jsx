@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiGet } from '../api/api';
 import { motion } from 'framer-motion';
 import { Heart, Search, User } from 'lucide-react';
 import Footer from './Footer';
@@ -16,15 +16,9 @@ const Following = () => {
   useEffect(() => {
     const fetchFollowedData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const res = await apiGet('/customer/followed-artists');
 
-        const res = await axios.get('http://localhost:3000/customer/followed-artists', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const artists = Array.isArray(res.data.followedArtists) ? res.data.followedArtists : [];
+        const artists = Array.isArray(res.followedArtists) ? res.followedArtists : [];
         setFollowedArtists(artists);
       } catch (err) {
         console.error('❌ Failed to fetch followed data:', err);

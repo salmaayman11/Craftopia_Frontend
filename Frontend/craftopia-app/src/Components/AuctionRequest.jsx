@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera, ChevronDown, Settings, Upload, Edit, Trash2, Package, PoundSterling, Users, Star, Clock, Plus, Menu, ShoppingCart, User, Heart, Search, Gavel, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { apiGet, apiPost } from '../api/api';
 
 
 
@@ -37,35 +38,11 @@ const AuctionRequest = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Helper function to get the auth token
-  const getAuthToken = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('Authentication token not found in localStorage. Please log in.');
-    }
-    return token;
-  };
-
   const fetchArtistAuctionRequests = async () => {
     setLoading(true);
     setError(null);
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found. Please log in to view auction requests.');
-      }
-
-      const response = await fetch('http://localhost:3000/auctionRequest/my-requests', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch auction requests');
-      }
-      const data = await response.json();
+      const data = await apiGet('/auctionRequest/my-requests');
       setAuctionRequests(data);
     } catch (err) {
       console.error('Error fetching auction requests:', err);
@@ -79,12 +56,7 @@ const AuctionRequest = () => {
     setLoadingCategories(true);
     setCategoriesError(null);
     try {
-      const response = await fetch('http://localhost:3000/category/all');
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch categories.');
-      }
-      const data = await response.json();
+      const data = await apiGet('/category/all');
       setCategoriesList(data.categories || []);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -101,25 +73,8 @@ const AuctionRequest = () => {
   }, []);
 
   const handleShipAuctionProduct = async (auctionId) => {
-    const token = getAuthToken();
-    if (!token) {
-      setError('You must be logged in to perform this action.');
-      return;
-    }
-
     try {
-      const response = await fetch(`http://localhost:3000/order/shipment-auction/${auctionId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create shipment.');
-      }
-
+      await apiPost(`/order/shipment-auction/${auctionId}`, {});
       setSuccessMessage('Shipment created successfully!');
       fetchArtistAuctionRequests();
     } catch (error) {
@@ -188,11 +143,6 @@ const AuctionRequest = () => {
     }
 
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found. Please log in before submitting an auction request.');
-      }
-
       // Step 1: Create Product
       const productFormData = new FormData();
       productFormData.append('name', title);
@@ -207,20 +157,7 @@ const AuctionRequest = () => {
         productFormData.append('image', file);
       });
 
-      const productResponse = await fetch('http://localhost:3000/product/create', {
-        method: 'POST',
-        body: productFormData,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!productResponse.ok) {
-        const errorData = await productResponse.json();
-        throw new Error(errorData.message || 'Failed to create product.');
-      }
-
-      const productResult = await productResponse.json();
+      const productResult = await apiPost('/product/create', productFormData);
       const productId = productResult.product.productId;
 
       // Step 2: Create Auction Request
@@ -231,19 +168,7 @@ const AuctionRequest = () => {
         notes: notes || '',
       };
 
-      const auctionResponse = await fetch('http://localhost:3000/auctionRequest/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(auctionRequestPayload),
-      });
-
-      if (!auctionResponse.ok) {
-        const errorData = await auctionResponse.json();
-        throw new Error(errorData.message || 'Failed to create auction request.');
-      }
+      await apiPost('/auctionRequest/create', auctionRequestPayload);
 
       setSuccessMessage('Auction request submitted successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);

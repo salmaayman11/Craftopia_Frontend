@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiPost } from '../api/api';
 import { User, Heart, ShoppingCart } from 'lucide-react';
 
 const Register = () => {
@@ -39,7 +39,7 @@ const Register = () => {
     }
 
     try {
-      const { data } = await axios.post('http://localhost:3000/auth/register', {
+      const data = await apiPost('/auth/register', {
         email,
         password,
         role,
@@ -53,7 +53,7 @@ const Register = () => {
 
     } catch (err) {
       console.error(err);
-      const backendMessage = err.response?.data?.message || 'Registration failed';
+      const backendMessage = err.message || 'Registration failed';
       let friendlyMessage = '';
 
       if (

@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import axios from "axios";
+import { apiGet, apiPost, apiDelete } from "../api/api";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
@@ -21,25 +21,12 @@ export const CartProvider = ({ children }) => {
     }
   }, [token]);
 
-  const getAuthHeader = () => {
-    if (!token) return null;
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-  };
-
-  const fetchCart = async (authToken = token) => {
+  const fetchCart = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get("http://localhost:3000/mycart", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      const res = await apiGet("/mycart");
 
-      const items = res.data.cartItems.map((item) => {
+      const items = res.cartItems.map((item) => {
         const product = item.product;
         return {
           id: product.productId,
@@ -68,8 +55,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (product) => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     const existing = cartItems.find((item) => item.id === product.id);
     const currentCartQty = existing?.cartQuantity || 0;
@@ -79,11 +65,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       console.log("🛒 Adding product to cart:", product);
-      await axios.post(
-        `http://localhost:3000/mycart/add/${product.id}`,
-        {},
-        authHeader
-      );
+      await apiPost(`/mycart/add/${product.id}`, {});
 
       await fetchCart();
       console.log("✅ Product added to cart successfully");
@@ -95,17 +77,12 @@ export const CartProvider = ({ children }) => {
 
   const incrementQuantity = async (product) => {
     const id = product.id;
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     try {
-      const res = await axios.post(
-        `http://localhost:3000/mycart/increment/${id}`,
-        {},
-        authHeader
-      );
+      const res = await apiPost(`/mycart/increment/${id}`, {});
 
-      const updatedQty = res.data.cartItem.quantity;
+      const updatedQty = res.cartItem.quantity;
 
       setCartItems((prev) =>
         prev.map((item) =>
@@ -113,26 +90,21 @@ export const CartProvider = ({ children }) => {
         )
       );
     } catch (err) {
-      console.error("❌ Increment failed:", err.response?.data || err.message);
+      console.error("❌ Increment failed:", err.message);
     }
   };
 
   const decrementQuantity = async (product) => {
     const id = product.id;
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     try {
-      const res = await axios.post(
-        `http://localhost:3000/mycart/decrement/${id}`,
-        {},
-        authHeader
-      );
+      const res = await apiPost(`/mycart/decrement/${id}`, {});
 
-      if (res.data.message === "Cart item removed completely") {
+      if (res.message === "Cart item removed completely") {
         setCartItems((prev) => prev.filter((item) => item.id !== id));
       } else {
-        const updatedQty = res.data.cartItem.quantity;
+        const updatedQty = res.cartItem.quantity;
         setCartItems((prev) =>
           prev.map((item) =>
             item.id === id ? { ...item, cartQuantity: updatedQty } : item
@@ -140,19 +112,15 @@ export const CartProvider = ({ children }) => {
         );
       }
     } catch (err) {
-      console.error("❌ Decrement failed:", err.response?.data || err.message);
+      console.error("❌ Decrement failed:", err.message);
     }
   };
 
   const removeFromCart = async (id) => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     try {
-      await axios.delete(
-        `http://localhost:3000/mycart/remove/${id}`,
-        authHeader
-      );
+      await apiDelete(`/mycart/remove/${id}`);
       setCartItems((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       console.error("❌ Remove from cart failed:", err);
@@ -160,11 +128,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = async () => {
-    const authHeader = getAuthHeader();
-    if (!authHeader) return;
+    if (!token) return;
 
     try {
-      await axios.delete("http://localhost:3000/mycart/clear", authHeader);
+      await apiDelete("/mycart/clear");
       setCartItems([]);
     } catch (err) {
       console.error("❌ Clear cart failed:", err);

@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import Footer from '../Components/Footer';
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { apiGet } from '../api/api';
 const Shop = () => {
     const [searchParams] = useSearchParams();
     const initialCategory = searchParams.get('category') || 'All';
@@ -24,8 +25,7 @@ const Shop = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await fetch('http://localhost:3000/product/get');
-                const data = await res.json();
+                const data = await apiGet('/product/get');
 
                 const productsArray = data.products || [];
                 const formatted = productsArray

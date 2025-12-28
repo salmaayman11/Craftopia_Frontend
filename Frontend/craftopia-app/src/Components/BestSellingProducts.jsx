@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import axios from "axios";
+import { apiGet } from "../api/api";
 import { motion } from "framer-motion";
 import ProductCard from "./ProductCard";
 import { useWishlist } from "../context/WishlistContext";
@@ -18,14 +18,9 @@ const BestSellingProducts = () => {
   const { cartItems, addToCart, incrementQuantity, decrementQuantity } = useCart();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/product/get", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+    apiGet("/product/get")
       .then((res) => {
-        const fetched = res.data.products || [];
+        const fetched = res.products || [];
 
         const sorted = fetched
   .filter(

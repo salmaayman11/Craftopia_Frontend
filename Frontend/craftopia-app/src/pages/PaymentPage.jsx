@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiGet, apiPost } from '../api/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from "../context/CartContext";
 
@@ -20,12 +20,8 @@ const PaymentPage = () => {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/order/${orderId}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                setOrder(response.data.order);
+                const response = await apiGet(`/order/${orderId}`);
+                setOrder(response.order);
             } catch (err) {
                 console.error('Failed to load order:', err);
                 setError('Failed to load order details. Please try again later.');
@@ -58,14 +54,9 @@ const PaymentPage = () => {
         setError('');
 
         try {
-            await axios.post(
-                `http://localhost:3000/payment/escrow/pay/${order.orderId}?creditCardNumber=${cleanedReference}&expiryDate=${expiryDate}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                }
+            await apiPost(
+                `/payment/escrow/pay/${order.orderId}?creditCardNumber=${cleanedReference}&expiryDate=${expiryDate}`,
+                {}
             );
             clearCart();
             setPaymentSuccess(true);
@@ -75,7 +66,7 @@ const PaymentPage = () => {
 
         } catch (err) {
             console.error('Payment error:', err);
-            setError(err.response?.data?.message || 'Payment failed. Please check your card details and try again.');
+            setError(err.message || 'Payment failed. Please check your card details and try again.');
         } finally {
             setIsPaying(false);
         }

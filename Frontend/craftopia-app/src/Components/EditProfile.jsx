@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { apiGet, apiPost } from "../api/api";
 
 const EditProfile = () => {
     const [name, setName] = useState("");
@@ -17,17 +18,7 @@ const EditProfile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch("http://localhost:3000/artist/myprofile", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
-
-                if (!response.ok) throw new Error("Failed to fetch profile");
-
-                const data = await response.json();
+                const data = await apiGet("/artist/myprofile");
                 const artist = data.ArtistProfile;
 
                 setName(artist.name || "");
@@ -64,25 +55,7 @@ const EditProfile = () => {
         if (profileVideoFile) formData.append("profileVideo", profileVideoFile);
 
         try {
-            const response = await fetch("http://localhost:3000/artist/update", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (data.message === "Username already exists") {
-                    setMessage("Username already exists. Please choose a different one.");
-                } else {
-                    setMessage("Failed to update profile.");
-                }
-                setLoading(false);
-                return;
-            }
+            const data = await apiPost("/artist/update", formData);
 
             if (data.artist && data.artist.artistId) {
                 localStorage.setItem("artistId", data.artist.artistId);

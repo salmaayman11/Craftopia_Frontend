@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import { apiGet } from '../api/api';
 import { AiOutlineHeart, AiOutlineShoppingCart } from 'react-icons/ai';
 import { FaUser, FaSearch, FaUserFriends } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
@@ -18,20 +18,17 @@ const Navbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
         const [productsRes, artistsRes, auctionsRes] = await Promise.all([
-          axios.get('http://localhost:3000/product/get'),
-          axios.get('http://localhost:3000/artist/all'),
-          axios.get('http://localhost:3000/auction', { headers }),
+          apiGet('/product/get'),
+          apiGet('/artist/all'),
+          apiGet('/auction'),
         ]);
 
-        setAllProducts(productsRes.data.products || []);
-        setAllArtists(artistsRes.data.artists || []);
-        setAuctions(auctionsRes.data.auctions || []);
+        setAllProducts(productsRes.products || []);
+        setAllArtists(artistsRes.artists || []);
+        setAuctions(auctionsRes.auctions || []);
       } catch (err) {
-        console.error('Navbar fetch error:', err.response?.data || err.message);
+        console.error('Navbar fetch error:', err.message);
       }
     };
     fetchData();

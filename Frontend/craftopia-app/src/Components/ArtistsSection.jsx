@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import { apiGet } from '../api/api';
 import { motion } from 'framer-motion';
 import { Award, Star, Palette, Users, ArrowRight } from 'lucide-react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -15,12 +15,9 @@ const ArtistsSection = () => {
   useEffect(() => {
     const fetchArtists = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/artist/all', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await apiGet('/artist/all');
 
-        const formatted = (response.data.artists || []).slice(0, 10).map((artist) => ({
+        const formatted = (response.artists || []).slice(0, 10).map((artist) => ({
           id: artist.artistId,
           name: artist.name,
           specialty: artist.categories?.join(', ') || 'N/A',

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Clock, Users, Gavel, Check, X, Eye, PoundSterling,
 } from 'lucide-react';
+import { apiGet, apiPost } from '../api/api';
 
 const AdminAuctionManagement = () => {
   const [activeTab, setActiveTab] = useState('requests');
@@ -33,35 +34,10 @@ const AdminAuctionManagement = () => {
   });
 };
 
-  const getAuthToken = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.warn("Authentication token not found in localStorage.");
-    }
-    return token;
-  };
-
-  const commonHeaders = () => {
-    const token = getAuthToken();
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-  };
-
   const fetchActiveAuctions = async () => {
   try {
-    const response = await fetch('http://localhost:3000/auction', {
-      headers: commonHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const { auctions } = await response.json();
-    setActiveAuctions(auctions);
+    const response = await apiGet('/auction');
+    setActiveAuctions(response.auctions || []);
   } catch (err) {
     console.error("Failed to fetch active auctions:", err);
     setErrorRequests(`Failed to load active auctions: ${err.message}`);
@@ -73,15 +49,7 @@ const fetchAuctionRequests = async () => {
   setLoadingRequests(true);
   setErrorRequests(null);
   try {
-    const response = await fetch('http://localhost:3000/auctionRequest/all', {
-      headers: commonHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = await apiGet('/auctionRequest/all');
 
     const pending = data.filter(req => req.status === 'pending');
     const active = data.filter(req =>
@@ -100,13 +68,7 @@ const fetchAuctionRequests = async () => {
 
 const fetchArtists = async () => {
   try {
-    const response = await fetch('http://localhost:3000/artist/all', {
-      headers: commonHeaders(),
-    });
-
-    if (!response.ok) throw new Error('Failed to fetch artists');
-
-    const data = await response.json();
+    const data = await apiGet('/artist/all');
     const map = {};
 
     data.artists.forEach(artist => {
@@ -121,15 +83,7 @@ const fetchArtists = async () => {
 
 const fetchTodayBids = async () => {
   try {
-    const response = await fetch('http://localhost:3000/bid/today-bids', {
-      headers: commonHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = await apiGet('/bid/today-bids');
     setTodayBidCount(data.totalBids || 0);
   } catch (err) {
     console.error("Failed to fetch today's bids:", err);
@@ -183,16 +137,7 @@ const handleApproveRequest = async () => {
   };
 
   try {
-    const response = await fetch(`http://localhost:3000/auctionRequest/schedule/${requestId}`, {
-      method: 'POST',
-      headers: commonHeaders(),
-      body: JSON.stringify(approvalBody),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || response.statusText);
-    }
+    await apiPost(`/auctionRequest/schedule/${requestId}`, approvalBody);
 
     setFeedbackMessage('Auction request approved and scheduled.');
     setTimeout(() => setFeedbackMessage(''), 3000);
@@ -217,16 +162,7 @@ const handleDeclineRequest = async () => {
 
 
   try {
-    const response = await fetch(`http://localhost:3000/auctionRequest/reject/${requestId}`, {
-      method: 'POST',
-      headers: commonHeaders(),
-      body: JSON.stringify(declineBody),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || response.statusText);
-    }
+    await apiPost(`/auctionRequest/reject/${requestId}`, declineBody);
 
     setFeedbackMessage('Auction request rejected.');
     setTimeout(() => setFeedbackMessage(''), 3000);

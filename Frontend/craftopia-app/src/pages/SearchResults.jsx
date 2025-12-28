@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiGet } from '../api/api';
 import { motion } from 'framer-motion';
 import { PoundSterling } from 'lucide-react';
 
@@ -24,18 +24,15 @@ const SearchResults = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
         const [productRes, artistRes, auctionRes] = await Promise.all([
-          axios.get('http://localhost:3000/product/get'),
-          axios.get('http://localhost:3000/artist/all'),
-          axios.get('http://localhost:3000/auction', { headers }),
+          apiGet('/product/get'),
+          apiGet('/artist/all'),
+          apiGet('/auction'),
         ]);
 
-        const allProducts = productRes.data.products || [];
-        const allArtists = artistRes.data.artists || [];
-        const allAuctions = auctionRes.data.auctions || [];
+        const allProducts = productRes.products || [];
+        const allArtists = artistRes.artists || [];
+        const allAuctions = auctionRes.auctions || [];
 
         setProducts(allProducts);
         setArtists(allArtists);

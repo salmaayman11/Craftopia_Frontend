@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiGet, apiPost, apiDelete } from '../api/api';
 import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ArtistCard from '../Components/ArtistCard';
@@ -16,39 +16,30 @@ const Artists = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-
         const [allArtistsRes, categoriesRes] = await Promise.all([
-          axios.get('http://localhost:3000/artist/all'),
-          axios.get('http://localhost:3000/category/all'),
+          apiGet('/artist/all'),
+          apiGet('/category/all'),
         ]);
 
         let followedArtistIds = [];
 
         // ✅ Try to fetch followed artists, but don't break everything if it fails
-        if (token) {
-          try {
-            const followedRes = await axios.get(
-              'http://localhost:3000/customer/followed-artists',
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            );
-            followedArtistIds = followedRes.data.followedArtists?.map((a) => a.artistId) || [];
-          } catch (followErr) {
-            console.warn('User not logged in or unauthorized to fetch followed artists.');
-            // It's safe to ignore this if token is invalid/expired.
-          }
+        try {
+          const followedRes = await apiGet('/customer/followed-artists');
+          followedArtistIds = followedRes.followedArtists?.map((a) => a.artistId) || [];
+        } catch (followErr) {
+          console.warn('User not logged in or unauthorized to fetch followed artists.');
+          // It's safe to ignore this if token is invalid/expired.
         }
 
         // Merge isFollowing
-        const updatedArtists = allArtistsRes.data.artists.map((artist) => ({
+        const updatedArtists = allArtistsRes.artists.map((artist) => ({
           ...artist,
           isFollowing: followedArtistIds.includes(artist.artistId),
         }));
 
         setArtists(updatedArtists);
-        setCategories(categoriesRes.data.categories || []);
+        setCategories(categoriesRes.categories || []);
       } catch (error) {
         console.error('Error fetching artist or category data:', error);
       }
@@ -85,34 +76,22 @@ const Artists = () => {
   };
 
   const handleToggleFollow = async (artistId) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     const targetArtist = artists.find(a => a.artistId === artistId);
     const isCurrentlyFollowing = targetArtist?.isFollowing;
 
-    const url = isCurrentlyFollowing
-      ? `http://localhost:3000/customer/unfollow/${artistId}`
-      : `http://localhost:3000/customer/follow/${artistId}`;
-
     try {
-      const res = await fetch(url, {
-        method: isCurrentlyFollowing ? "DELETE" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.ok) {
-        const updated = artists.map((artist) =>
-          artist.artistId === artistId
-            ? { ...artist, isFollowing: !isCurrentlyFollowing }
-            : artist
-        );
-        setArtists(updated);
+      if (isCurrentlyFollowing) {
+        await apiDelete(`/customer/unfollow/${artistId}`);
       } else {
-        console.error("Failed to toggle follow state");
+        await apiPost(`/customer/follow/${artistId}`, {});
       }
+
+      const updated = artists.map((artist) =>
+        artist.artistId === artistId
+          ? { ...artist, isFollowing: !isCurrentlyFollowing }
+          : artist
+      );
+      setArtists(updated);
     } catch (err) {
       console.error("Error during follow/unfollow:", err);
     }

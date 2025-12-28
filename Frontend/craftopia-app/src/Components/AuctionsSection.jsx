@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Clock, Users, Gavel, ArrowRight, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import AbstractAuctionCard from './AbstractAuctionCard'; 
+import AbstractAuctionCard from './AbstractAuctionCard';
+import { apiGet } from '../api/api';
 
 const formatTimeLeft = (endDate) => {
   const end = new Date(endDate);
@@ -24,8 +25,7 @@ const AuctionsSection = () => {
   useEffect(() => {
     const fetchAuctions = async () => {
       try {
-        const res = await fetch('http://localhost:3000/auction');
-        const data = await res.json();
+        const data = await apiGet('/auction');
         const mapped = data.auctions
           .filter((a) => a.status === 'active')
           .map((a) => ({

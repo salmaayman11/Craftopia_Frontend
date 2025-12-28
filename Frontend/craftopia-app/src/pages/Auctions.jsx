@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Clock, Users, ChevronDown ,Search, Gavel , TrendingUp} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
-import AbstractAuctionCard from '../Components/AbstractAuctionCard'; 
+import AbstractAuctionCard from '../Components/AbstractAuctionCard';
+import { apiGet } from '../api/api'; 
 
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
@@ -16,15 +17,9 @@ const Auctions = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [auctionRes, categoryRes] = await Promise.all([
-          fetch('http://localhost:3000/auction', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          }),
-          fetch('http://localhost:3000/category/all'),
-        ]);
         const [auctionData, categoryData] = await Promise.all([
-          auctionRes.json(),
-          categoryRes.json(),
+          apiGet('/auction'),
+          apiGet('/category/all'),
         ]);
         setAuctions(auctionData.auctions || []);
         setCategories(categoryData.categories || []);

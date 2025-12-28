@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiGet, apiPost } from "../api/api";
 
 const RequestCategory = () => {
   const [categoryName, setCategoryName] = useState("");
@@ -9,8 +10,7 @@ const RequestCategory = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:3000/category/all");
-        const data = await res.json();
+        const data = await apiGet("/category/all");
         setExistingCategories(data.categories || []);
       } catch (err) {
         console.error("Failed to fetch categories:", err.message);
@@ -44,35 +44,23 @@ const RequestCategory = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:3000/category/createrequest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: categoryName }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.message === "Artist profile not found") {
-          throw new Error("Please complete your artist profile first.");
-        }
-        throw new Error(data.message || "Failed to request category");
-      }
+      const data = await apiPost("/category/createrequest", { name: categoryName });
 
       setMessage({
         type: "success",
         text:
-          data.message.includes("updated. Counter incremented")
+          data.message && data.message.includes("updated. Counter incremented")
             ? "This category has been requested by another artist. Your request has been added."
-            : data.message,
+            : data.message || "Category request submitted successfully",
       });
 
       setCategoryName("");
     } catch (error) {
-      setMessage({ type: "error", text: error.message });
+      if (error.message && error.message.includes("Artist profile not found")) {
+        setMessage({ type: "error", text: "Please complete your artist profile first." });
+      } else {
+        setMessage({ type: "error", text: error.message || "Failed to request category" });
+      }
     } finally {
       setIsSubmitting(false);
     }

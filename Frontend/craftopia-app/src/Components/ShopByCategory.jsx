@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiGet } from '../api/api';
 
 
 const ShopByCategory = () => {
@@ -12,8 +13,7 @@ const ShopByCategory = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:3000/category/all');
-        const data = await response.json();
+        const data = await apiGet('/category/all');
 
         const formatted = data.categories.map((category, index) => ({
           ...category,

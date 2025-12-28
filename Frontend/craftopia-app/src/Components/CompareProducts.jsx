@@ -13,6 +13,7 @@ import {
     Tag,
     PoundSterling,
 } from "lucide-react";
+import { apiGet } from "../api/api";
 
 
 const CompareProducts = () => {
@@ -20,8 +21,7 @@ const CompareProducts = () => {
     const [compareList, setCompareList] = useState([]);
     const navigate = useNavigate();
     useEffect(() => {
-        fetch("http://localhost:3000/product/get")
-            .then((res) => res.json())
+        apiGet("/product/get")
             .then((data) => {
                 const normalProducts = data.products.filter(p => p.type === 'normal');
                 setProducts(normalProducts);

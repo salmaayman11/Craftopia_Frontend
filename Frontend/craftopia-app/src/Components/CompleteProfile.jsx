@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { apiPost } from "../api/api";
 
 const CompleteProfile = ({ onClose, onProfileComplete, initialProfile }) => {
   const [name, setName] = useState(initialProfile?.name || "");
@@ -20,7 +21,7 @@ const CompleteProfile = ({ onClose, onProfileComplete, initialProfile }) => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateFields();
     if (Object.keys(errors).length > 0) {
@@ -31,44 +32,27 @@ const CompleteProfile = ({ onClose, onProfileComplete, initialProfile }) => {
     }
 
     const profileData = { name, username, phone, address };
-    const token = localStorage.getItem("token");
 
-    fetch("http://localhost:3000/customer/createprofile", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(profileData),
-    })
-      .then(async (res) => {
-        const data = await res.json();
+    try {
+      const data = await apiPost("/customer/createprofile", profileData);
 
-        if (!res.ok) {
-          if (data.message === "Username already exists") {
-            setFieldErrors({ username: "Username already exists. Please choose another one." });
-            setError("Username already exists.");
-          } else {
-            setError("Failed to update profile.");
-          }
-          setSuccessMessage("");
-          return;
-        }
-
-        setSuccessMessage("Profile updated successfully!");
-        setError("");
-        setFieldErrors({});
-        onProfileComplete(data.customerProfile || data.existingCustomer);
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error(err);
+      setSuccessMessage("Profile updated successfully!");
+      setError("");
+      setFieldErrors({});
+      onProfileComplete(data.customerProfile || data.existingCustomer);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      if (err.message && err.message.includes("Username already exists")) {
+        setFieldErrors({ username: "Username already exists. Please choose another one." });
+        setError("Username already exists.");
+      } else {
         setError("Failed to update profile.");
-        setSuccessMessage("");
-      });
-
+      }
+      setSuccessMessage("");
+    }
   };
 
   return (

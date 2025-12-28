@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CompleteProfile from "./CompleteProfile";
+import { apiGet } from "../api/api";
 
 const Profile = ({ initialShowEdit = false, onProfileComplete, initialProfile }) => {
   const [profileData, setProfileData] = useState(initialProfile || null);
@@ -9,36 +10,23 @@ const Profile = ({ initialShowEdit = false, onProfileComplete, initialProfile })
 
   useEffect(() => {
     if (!initialProfile) {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        fetch("http://localhost:3000/customer/getprofile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        })
-          .then((response) => {
-            if (!response.ok) throw new Error("Failed to fetch profile");
-            return response.json();
-          })
-          .then((data) => {
-            if (!data.customerProfile || !data.customerProfile.name) {
-              setProfileMissing(true);
-            } else {
-              setProfileData(data.customerProfile);
-              setProfileMissing(false);
-            }
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.error("Error fetching profile:", error);
-            setLoading(false);
+      const fetchProfile = async () => {
+        try {
+          const data = await apiGet("/customer/getprofile");
+          if (!data.customerProfile || !data.customerProfile.name) {
             setProfileMissing(true);
-          });
-      } else {
-        setLoading(false);
-        setProfileMissing(true);
-      }
+          } else {
+            setProfileData(data.customerProfile);
+            setProfileMissing(false);
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          setLoading(false);
+          setProfileMissing(true);
+        }
+      };
+      fetchProfile();
     }
   }, [initialProfile]);
 
