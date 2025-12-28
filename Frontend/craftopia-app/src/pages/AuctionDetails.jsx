@@ -4,7 +4,7 @@ import { ArrowLeft, Heart, Box, PoundSterling,ChartColumnStacked, Clock, Users, 
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../Components/Footer';
 import { toast } from 'react-hot-toast';
-
+import { apiGet, apiPost, apiDelete } from "../api/api";
 
 const CountdownTimer = ({ endTime, status}) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: '00', minutes: '00', seconds: '00' });
@@ -253,10 +253,8 @@ const getCurrentUserInfo = () => {
 
 const fetchAuctionAndArtist = async () => {
   try {
-    const resAuction = await fetch(`http://localhost:3000/auction/${id}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    const auctionData = await resAuction.json();
+    const auctionData = await apiGet(`/auction/${id}`);
+
     const auctionObj = auctionData.auction;
     setAuction(auctionObj);
 
@@ -273,17 +271,14 @@ const fetchAuctionAndArtist = async () => {
     }
 
 
-    const resArtist = await fetch(`http://localhost:3000/artist/getprofile/${auctionObj.artist.artistId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    const artistData = await resArtist.json();
+    const artistData = await apiGet(
+      `/artist/getprofile/${auctionObj.artist.artistId}`
+    );
+    
     setArtist(artistData.artist);
 
     if (token) {
-      const followedRes = await fetch("http://localhost:3000/customer/followed-artists", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const followedData = await followedRes.json();
+      const followedData = await apiGet(`/customer/followed-artists`);
       const isFollowed = followedData.followedArtists?.some(
         (a) => a.artistId === artistData.artist.artistId
       );
@@ -302,10 +297,7 @@ useEffect(() => {
 useEffect(() => {
   const interval = setInterval(async () => {
     try {
-      const res = await fetch(`http://localhost:3000/auction/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+      const data = await apiGet(`/auction/${id}`);
       setAuction(data.auction);
     } catch (err) {
       console.error('Failed to update auction:', err);
@@ -340,19 +332,20 @@ const handleFollowClick = async () => {
   const artistId = artist?.artistId;
 
   try {
-    const url = newFollowingState
-      ? `http://localhost:3000/customer/follow/${artistId}`
-      : `http://localhost:3000/customer/unfollow/${artistId}`;
 
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+
+    if (newFollowingState) {
+      await apiPost(`/customer/follow/${artistId}`);
+    } else {
+      await apiDelete(`/customer/unfollow/${artistId}`);
+    }
+    setFollowing(newFollowingState);
+
+
   } catch (error) {
     console.error('Error toggling follow state:', error);
-    setFollowing(!newFollowingState); 
+    setFollowing(!newFollowingState);
+    
   }
 };
 
@@ -386,31 +379,11 @@ const handleBidSubmit = async () => {
 
   const auctionId = auction.id;
 
-  const url = userBid
-    ? 'http://localhost:3000/bid/update'
-    : 'http://localhost:3000/bid/place';
-
-  const payload = userBid
-    ? { auctionId, newBidAmount: amount }
-    : { auctionId, bidAmount: amount };
-
-  const method = userBid ? 'PUT' : 'POST';
-
   try {
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      const backendMessage = errorData?.message || 'Bid failed';
-      throw new Error(backendMessage);
-    }
+    const res = await apiPost(
+      userBid ? '/bid/update' : '/bid/place',
+      { auctionId, newBidAmount: amount }
+    );
 
     setBidAmount('');
     setError('✅ Bid submitted successfully!');

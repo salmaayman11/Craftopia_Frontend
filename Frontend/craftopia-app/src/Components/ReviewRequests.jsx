@@ -4,6 +4,8 @@ import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import ArtistResponses from "./ArtistResponses";
 import { motion } from "framer-motion";
 import {toast} from "react-hot-toast";
+import { apiGet, apiPost } from "../api/api";
+
 const ReviewRequests = () => {
     const [requests, setRequests] = useState([]);
     const [error, setError] = useState(null);
@@ -15,16 +17,7 @@ const ReviewRequests = () => {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const response = await fetch("http://localhost:3000/customizationRequest/requests", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) throw new Error("Failed to fetch requests.");
-
-                const data = await response.json();
+                const data = await apiGet("/customizationRequest/requests");
                 setRequests(data);
             } catch (err) {
                 setError(err.message);
@@ -62,7 +55,6 @@ const ReviewRequests = () => {
     };
 
     const handleSubmitReply = async (requestId) => {
-        const token = localStorage.getItem("token");
         const replyData = replyForms[requestId];
 
         if (!replyData || !replyData.price || !replyData.note || !replyData.estimationCompletionDate) {
@@ -80,18 +72,7 @@ const ReviewRequests = () => {
                 formData.append("image", replyData.imageFile);
             }
 
-            const response = await fetch(`http://localhost:3000/customizationResponse/respond/${requestId}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to submit response.");
-            }
+            await apiPost(`/customizationResponse/respond/${requestId}`, formData, {}, true);
 
             toast.success("Response sent successfully!");
             setReplyForms(prev => ({

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import axios from "axios";
+import { apiGet } from "../api/api";
 import { format, isAfter, isBefore } from "date-fns";
 import { BarChart2, CalendarDays } from "lucide-react";
 import {
@@ -32,36 +32,22 @@ const SalesHistory = () => {
             setLoading(true);
             setError(null);
 
-            const token = localStorage.getItem("token");
-            if (!token) {
-                setError("Not authenticated.");
-                setLoading(false);
-                return;
-            }
-
             try {
-                const profileRes = await axios.get("http://localhost:3000/artist/myprofile", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const profileRes = await apiGet("/artist/myprofile");
 
-                const artist = profileRes.data?.ArtistProfile;
+                const artist = profileRes?.ArtistProfile;
                 const fetchedArtistId = artist?.artistId;
                 if (!fetchedArtistId) throw new Error("Artist ID not found");
                 setArtistId(fetchedArtistId);
 
-                const salesRes = await axios.get(
-                    `http://localhost:3000/trackSales/Salesofartist/${fetchedArtistId}`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                const salesRes = await apiGet(`/trackSales/Salesofartist/${fetchedArtistId}`);
 
-                const data = salesRes.data.data || [];
+                const data = salesRes.data || [];
                 setSales(data);
                 setFilteredSales(data);
             } catch (err) {
                 console.error(err);
-                setError(err.response?.data?.message || err.message || "Failed to load sales.");
+                setError(err.message || "Failed to load sales.");
             } finally {
                 setLoading(false);
             }

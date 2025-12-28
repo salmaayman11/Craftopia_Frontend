@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { XMarkIcon, PaperAirplaneIcon, PaperClipIcon } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
+import { apiGet, apiPost } from "../api/api";
 
 const Messages = ({ responseId, onClose }) => {
     const [messages, setMessages] = useState([]);
@@ -12,34 +13,15 @@ const Messages = ({ responseId, onClose }) => {
     const [showWarning, setShowWarning] = useState(false);
     const chatRef = useRef(null);
     const inputRef = useRef(null);
-    const token = localStorage.getItem("token");
     const [messageCount, setMessageCount] = useState(0);
     const prevMessageCount = useRef(0);
 
 
     const getConversationByResponseId = async (responseId) => {
-        const res = await fetch(`http://localhost:3000/msg/conversation/${responseId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch conversation");
-        return res.json();
+        return await apiGet(`/msg/conversation/${responseId}`);
     };
-    const sendMessage = async ({ token, responseId, messageContent }) => {
-        const res = await fetch(`http://localhost:3000/msg/send/${responseId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ messageContent }),
-        });
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Failed to send message: ${res.statusText}: ${errorText}`);
-        }
-
-        return res.json();
+    const sendMessage = async ({ responseId, messageContent }) => {
+        return await apiPost(`/msg/send/${responseId}`, { messageContent });
     };
 
     useEffect(() => {
@@ -101,7 +83,7 @@ const Messages = ({ responseId, onClose }) => {
 
         setIsTyping(true);
         try {
-            await sendMessage({ token, responseId, messageContent: newMessage, attachment });
+            await sendMessage({ responseId, messageContent: newMessage });
 
             const updated = await getConversationByResponseId(responseId);
             const updatedMessages = updated.data.messages.map((msg) => ({

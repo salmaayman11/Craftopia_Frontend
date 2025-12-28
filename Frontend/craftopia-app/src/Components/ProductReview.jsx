@@ -10,7 +10,7 @@ import {
   X,
   Flag
 } from "lucide-react";
-import axios from "axios";
+import { apiGet, apiPost, apiPut, apiDelete } from "../api/api";
 import { motion } from "framer-motion";
 
 const decodeToken = () => {
@@ -42,10 +42,9 @@ const ProductReview = ({ productId, onStatsUpdate }) => {
 
   useEffect(() => {
     if (!productId) return;
-    axios
-      .get(`http://localhost:3000/review/getreview/${productId}`)
+    apiGet(`/review/getreview/${productId}`)
       .then((res) => {
-        const { reviews, averageRating, totalReviews } = res.data;
+        const { reviews, averageRating, totalReviews } = res;
         setReviews(Array.isArray(reviews) ? reviews : []);
         if (typeof onStatsUpdate === "function") {
           onStatsUpdate({ averageRating, totalReviews });
@@ -64,9 +63,7 @@ const ProductReview = ({ productId, onStatsUpdate }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/review/deletereview/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await apiDelete(`/review/deletereview/${id}`);
       setReviews((prev) => prev.filter((r) => r.reviewId !== id));
     } catch (err) {
       console.error("Delete failed", err);
@@ -76,11 +73,7 @@ const ProductReview = ({ productId, onStatsUpdate }) => {
   const handleEditSubmit = async (id) => {
     if (editText.trim().length < 10 || editText.trim().length > 500) return;
     try {
-      await axios.put(
-        `http://localhost:3000/review/updatereview/${id}`,
-        { review: editText },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      await apiPut(`/review/updatereview/${id}`, { review: editText });
       setReviews((prev) =>
         prev.map((r) => (r.reviewId === id ? { ...r, review: editText } : r))
       );
@@ -92,38 +85,29 @@ const ProductReview = ({ productId, onStatsUpdate }) => {
   };
 
   const handleSubmitReview = async () => {
-    const token = localStorage.getItem("token");
     setError("");
-    if (!token) return toast.error("Please login to submit a review.");
+    if (!localStorage.getItem("token")) return toast.error("Please login to submit a review.");
     if (!newRating) return setError("Please select a rating.");
     if (!newReview.trim()) return setError("Please write a review.");
     if (newReview.length < 10 || newReview.length > 500)
       return setError("Review must be between 10 and 500 characters.");
 
     try {
-      await axios.post(
-        "http://localhost:3000/review/create",
-        {
-          productId,
-          rating: Number(newRating),
-          review: newReview,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await apiPost("/review/create", {
+        productId,
+        rating: Number(newRating),
+        review: newReview,
+      });
 
-      const res = await axios.get(
-        `http://localhost:3000/review/getreview/${productId}`
-      );
-      const { reviews, totalReviews, averageRating } = res.data;
+      const res = await apiGet(`/review/getreview/${productId}`);
+      const { reviews, totalReviews, averageRating } = res;
       setReviews(reviews);
       onStatsUpdate?.({ averageRating, totalReviews });
       setNewReview("");
       setNewRating(0);
     } catch (err) {
-      const message = err?.response?.data?.message;
-      if (message === "You have already reviewed this product") {
+      const message = err?.message;
+      if (message && message.includes("already reviewed")) {
         setError("You have already submitted a review for this product.");
       } else {
         setError("Failed to submit. Please check your review and try again.");
@@ -134,34 +118,20 @@ const ProductReview = ({ productId, onStatsUpdate }) => {
   const handleReportSubmit = async () => {
     if (!reportContent.trim()) return toast.error("Please enter a reason for the report.");
     try {
-      const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("content", reportContent);
       if (attachment) formData.append("attachment", attachment);
 
-      const res = await fetch(
-        `http://localhost:3000/report/createReportUser/${reportingUsername}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        }
-      );
-
-      if (res.ok) {
-        setReportSuccess(true);
-        setTimeout(() => {
-          setShowReportModal(false);
-          setReportSuccess(false);
-          setAttachment(null);
-          setReportContent("");
-        }, 3000);
-      } else {
-        const data = await res.json();
-        toast.error(data.message || "Report submission failed.");
-      }
+      await apiPost(`/report/createReportUser/${reportingUsername}`, formData);
+      setReportSuccess(true);
+      setTimeout(() => {
+        setShowReportModal(false);
+        setReportSuccess(false);
+        setAttachment(null);
+        setReportContent("");
+      }, 3000);
     } catch (err) {
-      toast.error("An error occurred while submitting the report.");
+      toast.error(err.message || "Report submission failed.");
     }
   };
 

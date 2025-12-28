@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaUser, FaUserSlash } from "react-icons/fa";
-import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { apiGet, apiPost, apiPut } from "../api/api";
 
 const UserManagement = () => {
   const [tab, setTab] = useState("customers");
@@ -21,18 +21,13 @@ const UserManagement = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
         const [customersRes, artistsRes] = await Promise.all([
-          axios.get("http://localhost:3000/customer/all-customers", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:3000/artist/all", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          apiGet("/customer/all-customers"),
+          apiGet("/artist/all"),
         ]);
 
-        const sortedCustomers = Array.isArray(customersRes.data.customers)
-          ? customersRes.data.customers
+        const sortedCustomers = Array.isArray(customersRes.customers)
+          ? customersRes.customers
               .map((cust) => ({
                 ...cust,
                 banned: cust.banned ?? cust.isBanned ?? false,
@@ -41,8 +36,8 @@ const UserManagement = () => {
               .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           : [];
 
-        const sortedArtists = Array.isArray(artistsRes.data.artists)
-          ? artistsRes.data.artists
+        const sortedArtists = Array.isArray(artistsRes.artists)
+          ? artistsRes.artists
               .map((artist) => ({
                 ...artist,
                 banned: artist.banned ?? artist.isBanned ?? false,
@@ -65,19 +60,11 @@ const UserManagement = () => {
 
   const handleBanToggle = async (type, id, currentBanned) => {
     const action = currentBanned ? "unban" : "ban";
-    const url = `http://localhost:3000/report/${action}/${id}`;
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        url,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await apiPut(`/report/${action}/${id}`, {});
 
-      const updatedUser = response.data.data;
+      const updatedUser = response.data;
 
       if (type === "customer") {
         setCustomers((prev) =>
@@ -110,11 +97,7 @@ const UserManagement = () => {
   const handleAddAdmin = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.post("http://localhost:3000/admin/add-admin", adminData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await apiPost("/admin/add-admin", adminData);
 
       toast.success("Admin added successfully!");
       setAdminData({
@@ -125,7 +108,7 @@ const UserManagement = () => {
         phone: "",
       });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add admin");
+      toast.error(error.message || "Failed to add admin");
     }
   };
 

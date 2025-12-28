@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Upload } from "lucide-react";
 import AllProducts from "../Components/AllProducts";
+import { apiPost, apiGet } from "../api/api";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,6 @@ const AddProduct = () => {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [imageError, setImageError] = useState("");
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -42,28 +42,17 @@ const AddProduct = () => {
     }
 
     const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) =>
-      data.append(key, value)
-    );
+    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
     images.forEach((image) => data.append("image", image));
 
     setLoading(true);
     setMessage("");
 
     try {
-      const token = localStorage.getItem("token");
+      const res = await apiPost("/product/create", data);
 
-      const res = await fetch("http://localhost:3000/product/create", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: data,
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        setMessage(result.message || "Failed to create product.");
+      if (res?.message) {
+        setMessage(res.message);
       } else {
         setMessage("Product created successfully!");
         setFormData({
@@ -79,7 +68,7 @@ const AddProduct = () => {
         setImageError("");
       }
     } catch (error) {
-      setMessage("Server error, please try again later.");
+      setMessage(error.message || "Server error, please try again later.");
     } finally {
       setLoading(false);
     }
@@ -90,13 +79,8 @@ const AddProduct = () => {
       setLoadingCategories(true);
       setCategoriesError(null);
       try {
-        const response = await fetch("http://localhost:3000/category/all");
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch categories.");
-        }
-        const data = await response.json();
-        setCategoriesList(data.categories || []);
+        const res = await apiGet("/category/all"); // using api.js
+        setCategoriesList(res.categories || []);
       } catch (err) {
         console.error("Error fetching categories:", err);
         setCategoriesError(err.message || "Failed to load categories.");

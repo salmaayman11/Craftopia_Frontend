@@ -3,6 +3,7 @@ import { FaEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { FaTrash } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { apiGet, apiPut, apiDelete } from "../api/api";
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -15,40 +16,25 @@ const AllProducts = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:3000/artist/myprofile", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch artist profile");
-        const data = await res.json();
+        const data = await apiGet("/artist/myprofile");
         setArtistId(data.ArtistProfile?.artistId);
+        
       } catch (err) {
+        console.error("Error fetching artist profile:", err.message);
         setProductError("Failed to load artist profile.");
       }
-    };
-
+    }; 
     fetchProfile();
   }, []);
-
+  
   const fetchProducts = async () => {
     if (!artistId) return;
     setLoadingProducts(true);
     setProductError(null);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/product/get/${artistId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch products.");
-      const data = await res.json();
+      const data = await apiGet(`/product/get/${artistId}`);
       setProducts(data.products || []);
+      
 
       const initialEditData = {};
       data.products.forEach((p) => {
@@ -86,17 +72,7 @@ const AllProducts = () => {
 
   const handleUpdateProduct = async (productId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/product/update/${productId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedProductData[productId]),
-      });
-
-      if (!response.ok) throw new Error("Update failed");
+      await apiPut(`/product/update/${productId}`, updatedProductData[productId]);
       toast.success("Product updated successfully!");
       fetchProducts();
       setExpandedProductId(null);
@@ -113,21 +89,10 @@ const AllProducts = () => {
     setProducts((prev) => prev.filter((p) => p.productId !== productId));
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/product/delete/${productId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Delete failed");
-      }
-
+      await apiDelete(`/product/delete/${productId}`);
       toast.success("Product deleted successfully!");
+        fetchProducts();
+
     } catch (err) {
       setProducts(previousProducts);
       toast.error(`Error: ${err.message}`);
@@ -141,6 +106,7 @@ const AllProducts = () => {
   const filteredProducts = selectedProductName
     ? products.filter((p) => p.name === selectedProductName)
     : products;
+
 
   return (
     <div className="max-w-7xl mx-auto p-4">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import {toast} from "react-hot-toast";
+import api from "../api/api";
 
 const AdminReports = () => {
   const [reports, setReports] = useState([]);
@@ -11,17 +12,12 @@ const AdminReports = () => {
     setLoading(true);
     const endpoint =
       activeTab === "submitted"
-        ? "http://localhost:3000/report/submitted"
-        : "http://localhost:3000/report/reviewed";
-
+        ? "/report/submitted"
+        : "/report/reviewed";
+  
     try {
-      const response = await fetch(endpoint, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const result = await response.json();
+      const result = await api.get(endpoint);
+  
       if (result.success) {
         const formattedReports = result.data.map((report) => ({
           id: report.ReportId,
@@ -32,36 +28,31 @@ const AdminReports = () => {
           status: report.status,
           image: report.attachmentUrl,
         }));
-
         setReports(formattedReports);
       } else {
         console.error("Failed to fetch reports:", result.message);
       }
     } catch (error) {
-      console.error("Error fetching reports:", error);
+      console.error("Error fetching reports:", error.message);
     }
+  
     setLoading(false);
   };
+  
 
   const handleReview = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/report/review/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const result = await res.json();
+      const result = await api.put(`/report/review/${id}`);
       if (result.success) {
         fetchReports();
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error marking as reviewed:", error);
+      console.error("Error marking as reviewed:", error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchReports();

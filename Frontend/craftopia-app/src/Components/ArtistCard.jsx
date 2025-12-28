@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Heart, User, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { apiPost, apiDelete } from '../api/api';
 
 const ArtistCard = ({
   artistId,
@@ -30,24 +30,12 @@ const ArtistCard = ({
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('User not logged in');
-      return;
-    }
-
     try {
-      const url = following
-        ? `http://localhost:3000/customer/unfollow/${artistId}`
-        : `http://localhost:3000/customer/follow/${artistId}`;
-
-      await axios({
-        method: following ? 'delete' : 'post',
-        url,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (following) {
+        await apiDelete(`/customer/unfollow/${artistId}`);
+      } else {
+        await apiPost(`/customer/follow/${artistId}`, {});
+      }
 
       setFollowing(!following); 
 

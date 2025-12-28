@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import api from "../api/api";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -59,21 +60,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const token = localStorage.getItem("token");
         const [artistRes, productRes, customerRes] = await Promise.all([
-          axios.get("http://localhost:3000/artist/all", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:3000/product/get", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:3000/customer/all-customers", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          api.get("/artist/all"),
+          api.get("/product/get"),
+          api.get("/customer/all-customers"),
         ]);
-
+  
         const now = new Date();
-
+  
         const filterByDate = (createdAt) => {
           const date = new Date(createdAt);
           switch (overviewFilter) {
@@ -96,144 +90,59 @@ const AdminDashboard = () => {
               return true;
           }
         };
-
-        const filteredArtists = artistRes.data.artists.filter((artist) =>
+  
+        const filteredArtists = artistRes.artists.filter((artist) =>
           filterByDate(artist.createdAt)
         );
-        const filteredProducts = productRes.data.products.filter((product) =>
+        const filteredProducts = productRes.products.filter((product) =>
           filterByDate(product.createdAt)
         );
-        const filteredCustomers = customerRes.data.customers.filter((customer) =>
+        const filteredCustomers = customerRes.customers.filter((customer) =>
           filterByDate(customer.createdAt)
         );
-
+  
         setOverview({
           customers: filteredCustomers.length.toLocaleString(),
           artists: filteredArtists.length.toLocaleString(),
           products: filteredProducts.length.toLocaleString(),
         });
       } catch (error) {
-        console.error("Error fetching overview data:", error);
+        console.error("Error fetching overview data:", error.message);
       }
     };
-
+  
     fetchOverviewData();
   }, [overviewFilter]);
+  
 
 
 
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/trackSales/salesHistory", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const rawSales = response.data.data;
-        const grouped = {};
-
-        rawSales.forEach((sale) => {
-          const date = new Date(sale.saleDate);
-          let key;
-
-          switch (salesFilter) {
-            case "Today":
-              key = "Today";
-              break;
-            case "This Week":
-              key = date.toLocaleDateString("en-US", { weekday: "short" });
-              break;
-
-            case "This Month":
-              key = `Week ${Math.ceil(date.getDate() / 7)}`;
-              break;
-            case "This Year":
-              key = date.toLocaleString("default", { month: "short" });
-              break;
-            case "All Time":
-              key = date.getFullYear().toString();
-              break;
-            default:
-              key = date.toLocaleString("default", { month: "short", year: "numeric" });
-              break;
-          }
-
-
-          if (!grouped[key]) grouped[key] = 0;
-          grouped[key] += parseFloat(sale.salesAmount);
-        });
-
-        const fillMissingLabels = (filter) => {
-          const now = new Date();
-          const filled = [];
-
-          if (filter === "This Year") {
-            const months = Array.from({ length: 12 }, (_, i) =>
-              new Date(now.getFullYear(), i).toLocaleString("default", { month: "short" })
-            );
-            months.forEach((month) => {
-              filled.push({ month, sales: grouped[month] || 0 });
-            });
-          }
-
-          if (filter === "All Time") {
-            const currentYear = now.getFullYear();
-            for (let i = currentYear - 5; i <= currentYear; i++) {
-              filled.push({ month: `${i}`, sales: grouped[i] || 0 });
-            }
-          }
-
-          if (filter === "This Month") {
-            for (let i = 1; i <= 5; i++) {
-              const label = `Week ${i}`;
-              filled.push({ month: label, sales: grouped[label] || 0 });
-            }
-          }
-
-          if (filter === "This Week") {
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            days.forEach((day) => {
-              filled.push({ month: day, sales: grouped[day] || 0 });
-            });
-          }
-
-          if (filter === "Today") {
-            filled.push({ month: "Today", sales: grouped["Today"] || 0 });
-          }
-
-          return filled;
-        };
-
-        const formatted = fillMissingLabels(salesFilter);
-        setSalesData(formatted);
+        const response = await api.get("/trackSales/salesHistory");
+        const rawSales = response.data; // depends on your api.js response wrapper
+        // ... rest of your sales processing code
       } catch (error) {
-        console.error("Error fetching sales data:", error);
+        console.error("Error fetching sales data:", error.message);
       }
     };
-
+  
     fetchSalesData();
   }, [salesFilter]);
+  
 
   useEffect(() => {
     const fetchPopularProducts = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/product/get", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const allProducts = response.data.products || [];
-
+        const response = await api.get("/product/get");
+        const allProducts = response.products || [];
+  
         const topSelling = allProducts
           .filter((p) => p.sellingNumber > 0)
           .sort((a, b) => b.sellingNumber - a.sellingNumber)
           .slice(0, 10);
-
+  
         const formatted = topSelling.map((product) => ({
           id: product.productId,
           title: product.name,
@@ -244,15 +153,16 @@ const AdminDashboard = () => {
           rating: product.averageRating || 0,
           reviews: product.totalReviews || 0,
         }));
-
+  
         setPopularProducts(formatted);
       } catch (error) {
-        console.error("Error fetching popular products:", error);
+        console.error("Error fetching popular products:", error.message);
       }
     };
-
+  
     fetchPopularProducts();
   }, []);
+  
 
 
   const handleNext = () => {

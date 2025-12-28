@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaChartBar, FaRegSmileBeam } from "react-icons/fa";
 import { Plus } from "lucide-react";
+import { apiGet } from "../api/api";
 
 const AdminCategory = ({ setSelected }) => {
   const [requests, setRequests] = useState([]);
@@ -9,14 +10,10 @@ const AdminCategory = ({ setSelected }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const requestRes = await fetch("http://localhost:3000/category/getrequest", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
 
-        const requestData = await requestRes.json();
-        const catRes = await fetch("http://localhost:3000/category/all");
-        const catData = await catRes.json();
+        const requestData = await apiGet("/category/getrequest");
+        const catData = await apiGet("/category/all");
+        
 
         const allRequests = requestData.requestedCategories || [];
         const allCategories = catData.categories || [];

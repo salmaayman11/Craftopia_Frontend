@@ -4,6 +4,7 @@ import {
   ChatCircleDots,
   Coins
 } from "phosphor-react";
+import { apiGet } from "../api/api";
 
 const GetProfile = ({ setActiveTab }) => {
   const [profile, setProfile] = useState(null);
@@ -20,17 +21,7 @@ const GetProfile = ({ setActiveTab }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://localhost:3000/artist/myprofile", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch profile");
-
-        const data = await response.json();
+        const data = await apiGet("/artist/myprofile");
         setProfile(data.ArtistProfile);
       } catch (err) {
         console.error(err);
@@ -47,17 +38,7 @@ const GetProfile = ({ setActiveTab }) => {
     const fetchProducts = async () => {
       setLoadingProducts(true);
       try {
-        const res = await fetch(`http://localhost:3000/product/get/${profile.artistId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch products");
-
-        const data = await res.json();
+        const data = await apiGet(`/product/get/${profile.artistId}`);
         setProducts(data.products || []);
         setCustomizedProducts(data.customizableProducts || []);
         setProductsError("");
@@ -77,17 +58,7 @@ const GetProfile = ({ setActiveTab }) => {
 
     const fetchAuctionProducts = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/auction/artist-product/${profile.artistId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch auction products");
-
-        const data = await res.json();
+        const data = await apiGet(`/auction/artist-product/${profile.artistId}`);
 
         setAuctionProducts(
           data.products

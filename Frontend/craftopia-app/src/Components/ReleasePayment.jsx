@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiGet, apiPut } from "../api/api";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
 const ReleasePayment = () => {
@@ -10,11 +10,8 @@ const ReleasePayment = () => {
 
     const fetchHeldPayments = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await axios.get("http://localhost:3000/payment/escrow/held", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setHeldPayments(res.data.data || []);
+            const res = await apiGet("/payment/escrow/held");
+            setHeldPayments(res.data || []);
         } catch (err) {
             console.error("Error fetching escrow payments:", err);
         }
@@ -43,20 +40,15 @@ const ReleasePayment = () => {
         setMessage({ text: "", type: "" });
 
         try {
-            const token = localStorage.getItem("token");
             for (const id of selectedPayments) {
-                await axios.put(
-                    `http://localhost:3000/payment/escrow/release/${id}`,
-                    {},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                await apiPut(`/payment/escrow/release/${id}`, {});
             }
             setMessage({ text: "Payments released successfully!", type: "success" });
             await fetchHeldPayments();
             setSelectedPayments([]);
         } catch (err) {
             setMessage({
-                text: err.response?.data?.message || "Failed to release payment(s).",
+                text: err.message || "Failed to release payment(s).",
                 type: "error",
             });
         } finally {

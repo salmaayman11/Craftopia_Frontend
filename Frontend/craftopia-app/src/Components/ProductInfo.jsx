@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Star, Package, Ruler, Palette } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { apiGet } from "../api/api";
 
 const ProductInfo = ({ product }) => {
   const {
@@ -88,36 +89,21 @@ const ProductInfo = ({ product }) => {
   const handleArtistClick = async () => {
     try {
       console.log("Fetching artist profile...");
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       let artistId = null;
 
       if (product.artist && typeof product.artist === "object") {
         artistId = product.artist.id || product.artist.artistId;
       } else if (typeof product.artist === "string") {
-        const resName = await fetch(
-          `http://localhost:3000/artist/getbyname/${encodeURIComponent(product.artist)}`,
-          { headers }
-        );
-        if (!resName.ok) {
-          throw new Error("Failed to find artist by name");
-        }
-        const data = await resName.json();
+        const data = await apiGet(`/artist/getbyname/${encodeURIComponent(product.artist)}`);
         artistId = data.artist.artistId;
       }
 
       if (!artistId) {
         throw new Error("Artist ID not found");
       }
-      const res = await fetch(`http://localhost:3000/artist/getprofile/${artistId}`, {
-        headers,
-      });
-      if (!res.ok) {
-        throw new Error("Failed to fetch artist profile");
-      }
-
-      const artistData = await res.json();
+      
+      const artistData = await apiGet(`/artist/getprofile/${artistId}`);
       navigate(`/artist-profile-customer/${artistId}`, {
         state: { artist: artistData },
       });

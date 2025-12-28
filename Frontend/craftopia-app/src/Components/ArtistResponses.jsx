@@ -3,6 +3,7 @@ import { EnvelopeIcon, FlagIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import Messages from "./Messages";
 import { EllipsisVerticalIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { apiGet, apiPost, apiPut } from "../api/api";
 
 const ArtistResponses = () => {
     const [responses, setResponses] = useState([]);
@@ -26,21 +27,10 @@ const ArtistResponses = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const responsesRes = await fetch("http://localhost:3000/customizationResponse/artist/responses", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                if (!responsesRes.ok) throw new Error("Failed to fetch responses.");
-                const data = await responsesRes.json();
+                const data = await apiGet("/customizationResponse/artist/responses");
                 setResponses(data.responses);
                 setStatistics(data.statistics);
-                const messagesRes = await fetch("http://localhost:3000/msg/unread", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                if (!messagesRes.ok) throw new Error("Failed to fetch unread messages.");
-                const messagesData = await messagesRes.json();
+                const messagesData = await apiGet("/msg/unread");
                 setUnreadMessages(messagesData.data.unreadMessages || []);
 
             } catch (err) {
@@ -105,50 +95,24 @@ const ArtistResponses = () => {
                 formData.append("attachment", attachment);
             }
 
-            const res = await fetch(`http://localhost:3000/report/createReportUser/${reportingUsername}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });
+            await apiPost(`/report/createReportUser/${reportingUsername}`, formData, {}, true);
+            setReportSuccess(true);
 
-            const data = await res.json();
-
-            if (res.ok) {
-                setReportSuccess(true);
-
-                setTimeout(() => {
-                    setShowReportModal(false);
-                    setReportSuccess(false);
-                    setReportContent("");
-                    setAttachment(null);
-                }, 3000);
-            } else {
-                setReportToast({ show: true, message: data.message || "Failed to submit report.", success: false });
-            }
+            setTimeout(() => {
+                setShowReportModal(false);
+                setReportSuccess(false);
+                setReportContent("");
+                setAttachment(null);
+            }, 3000);
         } catch (error) {
             console.error(error);
-            setReportToast({ show: true, message: "An error occurred while submitting the report.", success: false });
+            setReportToast({ show: true, message: error.message || "An error occurred while submitting the report.", success: false });
         }
     };
     const handleShipOrder = async (responseId) => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:3000/order/ship/${responseId}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setShippingToast({ show: true, message: "Order shipped successfully!", success: true });
-            } else {
-                throw new Error(data.message || "Shipping failed.");
-            }
+            await apiPost(`/order/ship/${responseId}`, {});
+            setShippingToast({ show: true, message: "Order shipped successfully!", success: true });
         } catch (error) {
             setShippingToast({ show: true, message: error.message, success: false });
         } finally {

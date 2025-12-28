@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import AbstractAuctionCard from '../Components/AbstractAuctionCard';
 import { jwtDecode } from "jwt-decode";
+import { apiGet, apiPost, apiDelete } from "../api/api";
 
 
 
@@ -165,11 +166,8 @@ const ArtistProfileCustomer = () => {
         const token = localStorage.getItem('token');
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        const profileRes = await fetch(`http://localhost:3000/artist/getprofile/${id}`, {
-          headers
-        });
+        const profileData = await apiGet(`/artist/getprofile/${id}`);
 
-        const profileData = await profileRes.json();
         const a = profileData.artist;
         if (token) {
           try {
@@ -185,10 +183,8 @@ const ArtistProfileCustomer = () => {
         }
 
 
-        const productRes = await fetch(`http://localhost:3000/product/get/${id}`, {
-          headers
-        });
-        const productData = await productRes.json();
+        const productData = await apiGet(`/product/get/${id}`);
+
 
         // Combine and map all types of products
         const mappedNormal = productData.products.map(p => mapProduct(p, 'normal', a.name));
@@ -240,12 +236,7 @@ const ArtistProfileCustomer = () => {
       if (!token) return;
 
       try {
-        const res = await fetch(`http://localhost:3000/customer/followed-artists`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
+        const productData = await apiGet(`/product/get/${id}`);
         const followedIds = data.followedArtists.map(a => a.artistId);
         setIsFollowing(followedIds.includes(Number(id)));
       } catch (err) {
@@ -257,8 +248,8 @@ const ArtistProfileCustomer = () => {
 
     const fetchAuctionProducts = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/auction/artist-product/${id}`);
-        const data = await res.json();
+        const data = await apiGet(`/auction/artist-product/${id}`);
+
 
         const activeAuctions = data.auctions.filter(a => a.auction.status === 'active' || a.auction.status === 'scheduled');
 
@@ -292,8 +283,8 @@ const ArtistProfileCustomer = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/review/artist-reviews/${id}`);
-        const data = await res.json();
+        const data = await apiGet(`/review/artist-reviews/${id}`);
+
 
         const allReviews = [];
         data.productReviews.forEach(product => {
@@ -381,23 +372,17 @@ const ArtistProfileCustomer = () => {
       return;
     }
 
-    const url = isFollowing
-      ? `http://localhost:3000/customer/unfollow/${id}`
-      : `http://localhost:3000/customer/follow/${id}`;
+
 
     try {
-      const res = await fetch(url, {
-        method: isFollowing ? "DELETE" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.ok) {
-        setIsFollowing(!isFollowing);
+      if (isFollowing) {
+        await apiDelete(`/customer/unfollow/${id}`);
       } else {
-        console.error("Failed to toggle follow state");
+        await apiPost(`/customer/follow/${id}`);
       }
+      
+      setIsFollowing(!isFollowing);
+      
     } catch (err) {
       console.error("Error during follow/unfollow:", err);
     }
@@ -428,27 +413,21 @@ const ArtistProfileCustomer = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/report/createReportArtist/${artist.username}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
+      await apiPost(
+        `/report/createReportArtist/${artist.username}`,
+        formData
+      );
 
-      const data = await res.json();
-      if (res.ok) {
-        setReportSuccess("Report submitted successfully.");
-        setReportMessage("");
-        setAttachment(null);
+      setReportSuccess("Report submitted successfully.");
+      setReportMessage("");
+      setAttachment(null);
+      setTimeout(() => {
+        setReportSuccess("");
+        setShowReportModal(false);
+      }, 2000);
 
-        setTimeout(() => {
-          setReportSuccess("");
-          setShowReportModal(false);
-        }, 2000);
-      } else {
-        setReportError(data.message || "Failed to submit report.");
-      }
+
+      
     } catch (err) {
       setReportError("An error occurred while submitting the report.");
     }

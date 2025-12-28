@@ -5,6 +5,7 @@ import { EnvelopeIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import Messages from "./Messages";
 import {toast} from "react-hot-toast";
+import { apiGet, apiPost, apiPut } from "../api/api";
 
 const RequestCustomization = () => {
     const [formData, setFormData] = useState({
@@ -30,19 +31,10 @@ const RequestCustomization = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem("token");
             try {
-                const requestsRes = await fetch("http://localhost:3000/customizationRequest/noOffers", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!requestsRes.ok) throw new Error("Failed to fetch requests.");
-                const requestsData = await requestsRes.json();
+                const requestsData = await apiGet("/customizationRequest/noOffers");
                 setRequests(requestsData);
-                const repliesRes = await fetch("http://localhost:3000/customizationResponse/responses", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!repliesRes.ok) throw new Error("Failed to fetch replies.");
-                const repliesData = await repliesRes.json();
+                const repliesData = await apiGet("/customizationResponse/responses");
 
                 if (!repliesData.responses || !Array.isArray(repliesData.responses)) {
                     throw new Error("Invalid response format from server");
@@ -57,12 +49,7 @@ const RequestCustomization = () => {
                 }, {});
                 setGroupedReplies(grouped);
 
-                const messagesRes = await fetch("http://localhost:3000/msg/unread", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!messagesRes.ok) throw new Error("Failed to fetch unread messages.");
-
-                const messagesData = await messagesRes.json();
+                const messagesData = await apiGet("/msg/unread");
                 setUnreadMessages(messagesData.data.unreadMessages || []);
 
             } catch (error) {
@@ -105,17 +92,8 @@ const RequestCustomization = () => {
         form.append("deadline", formData.deadline);
         form.append("image", formData.image);
 
-        const token = localStorage.getItem("token");
-
         try {
-            const response = await fetch("http://localhost:3000/customizationRequest/request", {
-                method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
-                body: form,
-            });
-
-            if (!response.ok) throw new Error("Failed to send request.");
-            const data = await response.json();
+            await apiPost("/customizationRequest/request", form, {}, true);
 
             setMessage("Request submitted successfully!");
             setFormData({ title: "", description: "", budget: "", deadline: "", image: null });
@@ -156,24 +134,9 @@ const RequestCustomization = () => {
     };
 
     const updateReplyStatus = async (replyId, action) => {
-        const token = localStorage.getItem("token");
         try {
-            const response = await fetch(
-                `http://localhost:3000/customizationResponse/${action}/${replyId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            if (!response.ok) throw new Error(`Failed to ${action} reply.`);
-            const res = await fetch("http://localhost:3000/customizationResponse/responses", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
+            await apiPut(`/customizationResponse/${action}/${replyId}`, {});
+            const data = await apiGet("/customizationResponse/responses");
 
             setReplies(data.responses || []);
             const grouped = (data.responses || []).reduce((acc, reply) => {
