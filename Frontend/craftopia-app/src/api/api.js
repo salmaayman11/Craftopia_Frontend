@@ -66,6 +66,7 @@ export const apiGet = async (endpoint, options = {}) => {
   const response = await fetch(url, {
     method: 'GET',
     headers,
+    credentials: 'include',
     ...options,
   });
   
