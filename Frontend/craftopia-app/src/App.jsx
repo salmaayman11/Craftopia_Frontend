@@ -168,7 +168,7 @@ export default function App() {
     <AuthProvider>
       <WishlistProvider>
         <CartProvider>
-          <Router>
+        <Router basename="/craftopia-app">
             <ScrollToTop />
             <AppContent />
             <Toaster position="top-center" reverseOrder={false} />

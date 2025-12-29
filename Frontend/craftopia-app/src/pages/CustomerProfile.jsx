@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaUser, FaSignOutAlt, FaHeart } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaHeart, FaBars, FaTimes } from "react-icons/fa";
 import Profile from "../Components/Profile";
 import CompleteProfile from "../Components/CompleteProfile";
 import Wishlist from "../Components/Wishlist";
@@ -17,6 +17,7 @@ const CustomerProfile = ({ setIsLoggedIn }) => {
       const [activeTab, setActiveTab] = useState(() => {
         return localStorage.getItem("customerActiveTab") || "profile";
     });
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -43,47 +44,74 @@ const CustomerProfile = ({ setIsLoggedIn }) => {
         navigate("/login");
     };
 
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+        setSidebarOpen(false); // Close sidebar on mobile when selecting a tab
+    };
+
      return (
     <div className="flex flex-col min-h-screen bg-[#FAF9F6]">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="md:hidden fixed top-20 left-4 z-50 bg-white p-3 rounded-lg shadow-md touch-manipulation"
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex w-full flex-grow">
-        <div className="w-64 bg-white p-4 shadow-md ml-30 mt-20 rounded-2xl h-[60vh]">
+        <div className={`fixed md:static w-64 bg-white p-4 shadow-md md:ml-30 md:mt-20 rounded-2xl md:h-[60vh] z-40 transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}>
           <nav>
             <ul className="space-y-3">
               <li
-                onClick={() => setActiveTab("profile")}
-                className={`hover:bg-gray-100 p-2 rounded cursor-pointer flex items-center gap-2 ${activeTab === "profile" ? "bg-gray-200 font-semibold" : ""}`}
+                onClick={() => handleTabClick("profile")}
+                className={`hover:bg-gray-100 p-2.5 sm:p-2 rounded cursor-pointer flex items-center gap-2 touch-manipulation text-sm sm:text-base ${activeTab === "profile" ? "bg-gray-200 font-semibold" : ""}`}
               >
                 <FaUser className="text-black" />
                 My Profile
               </li>
 
               <li
-                onClick={() => setActiveTab("wishlist")}
-                className={`hover:bg-gray-100 p-2 rounded cursor-pointer flex items-center gap-2 ${activeTab === "wishlist" ? "bg-gray-200 font-semibold" : ""}`}
+                onClick={() => handleTabClick("wishlist")}
+                className={`hover:bg-gray-100 p-2.5 sm:p-2 rounded cursor-pointer flex items-center gap-2 touch-manipulation text-sm sm:text-base ${activeTab === "wishlist" ? "bg-gray-200 font-semibold" : ""}`}
               >
                 <FaHeart className="text-black" />
                 Wishlist
               </li>
 
               <li
-                onClick={() => navigate("/orders")}
-                className="hover:bg-gray-100 p-2 rounded cursor-pointer flex items-center gap-2"
+                onClick={() => {
+                  navigate("/orders");
+                  setSidebarOpen(false);
+                }}
+                className="hover:bg-gray-100 p-2.5 sm:p-2 rounded cursor-pointer flex items-center gap-2 touch-manipulation text-sm sm:text-base"
               >
                 <FiPackage className="text-black" />
                 My Orders
               </li>
 
               <li
-                onClick={() => setActiveTab("compare")}
-                className={`hover:bg-gray-100 p-2 rounded cursor-pointer flex items-center gap-2 ${activeTab === "compare" ? "bg-gray-200 font-semibold" : ""}`}
+                onClick={() => handleTabClick("compare")}
+                className={`hover:bg-gray-100 p-2.5 sm:p-2 rounded cursor-pointer flex items-center gap-2 touch-manipulation text-sm sm:text-base ${activeTab === "compare" ? "bg-gray-200 font-semibold" : ""}`}
               >
                 <MdCompare className="text-black" />
                 Compare Products
               </li>
 
               <li
-                onClick={() => setActiveTab("customization")}
-                className={`hover:bg-gray-100 p-2 rounded cursor-pointer flex items-center gap-2 ${activeTab === "customization" ? "bg-gray-200 font-semibold" : ""}`}
+                onClick={() => handleTabClick("customization")}
+                className={`hover:bg-gray-100 p-2.5 sm:p-2 rounded cursor-pointer flex items-center gap-2 touch-manipulation text-sm sm:text-base ${activeTab === "customization" ? "bg-gray-200 font-semibold" : ""}`}
               >
                 Custom products
               </li>
@@ -91,8 +119,8 @@ const CustomerProfile = ({ setIsLoggedIn }) => {
           </nav>
         </div>
 
-        <div className="flex-1 p-8 mt-20">
-          <div className="max-w-6xl mx-auto bg-[#FAF9F6] rounded-lg shadow-md p-6 -mt-8">
+        <div className="flex-1 p-4 sm:p-8 mt-20 md:mt-20">
+          <div className="max-w-6xl mx-auto bg-[#FAF9F6] rounded-lg shadow-md p-4 sm:p-6 -mt-8">
             {activeTab === "profile" && <Profile setActiveTab={setActiveTab} />}
             {activeTab === "edit" && <CompleteProfile />}
             {activeTab === "wishlist" && <Wishlist />}

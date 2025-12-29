@@ -8,20 +8,43 @@ import {
   FaSignOutAlt,
   FaExclamation,
   FaPlus, FaMoneyCheckAlt,
-  FaBoxes
+  FaBoxes,
+  FaBars,
+  FaTimes
 } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import { FaUser } from "react-icons/fa";
 
-const AdminSidebar = ({ selected, setSelected }) => {
+const AdminSidebar = ({ selected, setSelected, isOpen, setIsOpen }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   return (
-    <div className="w-85 h-screen bg-[#F6EEEE] p-5 flex flex-col shadow-md shadow-gray-400">
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 bg-[#F6EEEE] p-3 rounded-lg shadow-md touch-manipulation"
+        aria-label="Toggle menu"
+      >
+        {isOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed md:static w-85 h-screen bg-[#F6EEEE] p-5 flex flex-col shadow-md shadow-gray-400 z-40 transform transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      }`}>
       <div className="flex items-center gap-3 mb-20 pl-3">
         <h1
           className="text-[24px] cursor-pointer"
@@ -119,15 +142,15 @@ const AdminSidebar = ({ selected, setSelected }) => {
         />
       </div>
 
-    </div>
+      </div>
+    </>
   );
 };
 
 const SidebarButton = ({ icon, text, selected, onClick }) => {
   return (
     <button
-      className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all ${selected ? "bg-[#DEC5C2] shadow-md " : "hover:bg-[#E7D8D7] active:bg-[#D1B4B2]"
-        }`}
+      className={`w-full flex items-center gap-2 p-2.5 sm:p-2 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${selected ? "bg-[#DEC5C2] shadow-md" : "hover:bg-[#E7D8D7] active:bg-[#D1B4B2]"}`}
       onClick={onClick}
     >
       {icon} {text}

@@ -7,7 +7,11 @@
  */
 
 const getBaseURL = () => {
-  return import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) {
+    throw new Error('VITE_API_URL environment variable is not set. Please configure it in your .env file.');
+  }
+  return apiUrl;
 };
 
 const getAuthToken = () => {

@@ -164,7 +164,6 @@ const ArtistProfileCustomer = () => {
     const fetchArtistData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
         const profileData = await apiGet(`/artist/getprofile/${id}`);
 

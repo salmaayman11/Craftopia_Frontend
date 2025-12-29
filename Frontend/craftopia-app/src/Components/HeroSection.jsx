@@ -21,24 +21,24 @@ const HeroSection = () => {
             className="space-y-8"
           >
             <div>
-              <h1 className="text-4xl md:text-6xl font-bold text-black mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-black mb-4 sm:mb-6 leading-tight">
                 Discover
                 <span className="block text-coral">Handmade</span>
                 Treasures
               </h1>
-              <p className="text-lg text-black/80 mb-8 max-w-lg">
+              <p className="text-base sm:text-lg text-black/80 mb-6 sm:mb-8 max-w-lg">
                 Connect with talented artisans and find unique, handcrafted pieces that tell a story.
                 Support local artists and bring authentic craftsmanship into your home.
               </p>
             </div>
 
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 4px 15px rgba(233,75,60,0.4)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/shop')}
-                className="bg-coral hover:bg-coral/80 text-cream px-8 py-3 text-lg font-medium rounded-lg transition-all duration-300"
+                className="bg-coral hover:bg-coral/80 text-cream px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-lg transition-all duration-300 touch-manipulation min-h-[44px]"
               >
                 Shop Now
               </motion.button>
@@ -47,7 +47,7 @@ const HeroSection = () => {
                 whileHover={{ scale: 1.05, boxShadow: '0 4px 15px rgba(114,47,55,0.3)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/artists')}
-                className="border border-burgundy text-burgundy hover:bg-burgundy hover:text-cream px-8 py-3 text-lg rounded-lg font-semibold transition-all duration-300 shadow-lg "
+                className="border border-burgundy text-burgundy hover:bg-burgundy hover:text-cream px-6 sm:px-8 py-3 text-base sm:text-lg rounded-lg font-semibold transition-all duration-300 shadow-lg touch-manipulation min-h-[44px]"
               >
                 Explore Artisans
               </motion.button>
@@ -59,7 +59,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative"
+            className="relative hidden lg:block"
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
@@ -93,8 +93,8 @@ const HeroSection = () => {
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-coral/20 rounded-full animate-pulse"></div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-burgundy/20 rounded-full animate-pulse delay-1000"></div>
+            <div className="absolute -top-4 -right-4 w-20 h-20 bg-coral/20 rounded-full animate-pulse hidden xl:block"></div>
+            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-burgundy/20 rounded-full animate-pulse delay-1000 hidden xl:block"></div>
           </motion.div>
         </div>
       </div>

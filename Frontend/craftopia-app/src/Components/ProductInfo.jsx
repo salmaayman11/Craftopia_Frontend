@@ -113,7 +113,7 @@ const ProductInfo = ({ product }) => {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-12">
+    <div className="grid md:grid-cols-2 gap-6 sm:gap-12">
       <div className="space-y-4">
         <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
           <img
@@ -123,14 +123,14 @@ const ProductInfo = ({ product }) => {
           />
         </div>
 
-        <div className="flex gap-3 mt-2">
+        <div className="flex gap-2 sm:gap-3 mt-2 overflow-x-auto pb-2">
           {productImages.map((img, idx) => (
             <img
               key={idx}
               src={img}
               alt={`Thumbnail ${idx + 1}`}
               onClick={() => setSelectedImage(img)}
-              className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition-transform duration-200 ${selectedImage === img ? "ring-2 ring-[#E07385]" : "hover:scale-105"
+              className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border cursor-pointer transition-transform duration-200 flex-shrink-0 touch-manipulation ${selectedImage === img ? "ring-2 ring-[#E07385]" : "hover:scale-105"
                 }`}
             />
           ))}
@@ -145,7 +145,7 @@ const ProductInfo = ({ product }) => {
               : product.category?.name || "Handmade"}
           </p>
 
-          <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{product.name}</h1>
 
           <p className="text-sm text-gray-500">
             by{" "}
@@ -228,24 +228,24 @@ const ProductInfo = ({ product }) => {
 
         <div className="flex justify-center sm:justify-start mt-6">
           {maxQty === 0 ? (
-            <div className="w-full sm:w-1/2 bg-gray-300 text-gray-600 font-semibold py-3 px-6 rounded-full text-center shadow-inner cursor-not-allowed">
+            <div className="w-full sm:w-1/2 bg-gray-300 text-gray-600 font-semibold py-3 sm:py-3 px-6 rounded-full text-center shadow-inner cursor-not-allowed min-h-[44px] flex items-center justify-center">
               Sold Out
             </div>
           ) : quantity > 0 ? (
             <div className="flex items-center border rounded-full overflow-hidden w-full sm:w-1/2">
               <button
                 onClick={handleDecrease}
-                className="w-1/3 py-2 bg-[#fce7ea] text-[#E07385] font-bold hover:bg-[#f9d8e0] transition"
+                className="w-1/3 py-3 sm:py-2 bg-[#fce7ea] text-[#E07385] font-bold hover:bg-[#f9d8e0] transition touch-manipulation min-h-[44px]"
               >
                 −
               </button>
-              <span className="w-1/3 text-center py-2 font-medium text-gray-800 bg-white">
+              <span className="w-1/3 text-center py-3 sm:py-2 font-medium text-gray-800 bg-white min-h-[44px] flex items-center justify-center">
                 {quantity}
               </span>
               <button
                 onClick={handleIncrease}
                 disabled={isMaxReached}
-                className={`w-1/3 py-2 text-[#E07385] font-bold transition ${isMaxReached
+                className={`w-1/3 py-3 sm:py-2 text-[#E07385] font-bold transition touch-manipulation min-h-[44px] ${isMaxReached
                     ? "bg-gray-300 cursor-not-allowed"
                     : "bg-[#fce7ea] hover:bg-[#f9d8e0]"
                   }`}
@@ -256,7 +256,7 @@ const ProductInfo = ({ product }) => {
           ) : (
             <button
               onClick={handleAddToCart}
-              className="w-full sm:w-1/2 bg-[#E07385] hover:bg-[#cf5e72] text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 active:scale-95"
+              className="w-full sm:w-1/2 bg-[#E07385] hover:bg-[#cf5e72] text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 active:scale-95 touch-manipulation min-h-[44px]"
             >
               Add to Cart
             </button>

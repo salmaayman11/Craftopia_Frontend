@@ -18,12 +18,14 @@ const AdminPage = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredTabs, setFilteredTabs] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSetSelected = (tab) => {
     setSelected(tab);
     localStorage.setItem("adminSelectedTab", tab);
     setSearchTerm("");
     setFilteredTabs([]);
+    setSidebarOpen(false); // Close sidebar on mobile when selecting a tab
   };
 
   const handleSearchChange = (value) => {
@@ -62,8 +64,13 @@ const AdminPage = () => {
 
   return (
     <div className="flex min-h-screen bg-[#FAF9F6] overflow-hidden">
-      <AdminSidebar selected={selected} setSelected={handleSetSelected} />
-      <div className="flex flex-col items-stretch w-full ml-20 pr-10 overflow-auto h-screen">
+      <AdminSidebar 
+        selected={selected} 
+        setSelected={handleSetSelected} 
+        isOpen={sidebarOpen}
+        setIsOpen={setSidebarOpen}
+      />
+      <div className="flex flex-col items-stretch w-full md:ml-20 md:pr-10 overflow-auto h-screen px-4 md:px-0">
         <AdminSearchbar
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}

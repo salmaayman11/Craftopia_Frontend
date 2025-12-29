@@ -85,11 +85,11 @@ const maxReached = quantity >= maxStock;
             e.stopPropagation();
             onToggleFavorite?.(product);
           }}
-          className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow"
+          className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2.5 sm:p-2.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 shadow touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Toggle wishlist"
         >
           <Heart
-            className={`h-4 w-4 transition-colors duration-200 ${
+            className={`h-4 w-4 sm:h-4 sm:w-4 transition-colors duration-200 ${
               product.isFavorite
                 ? "fill-[#E07385] text-[#E07385]"
                 : "text-gray-400 hover:text-[#E07385]"
@@ -152,18 +152,18 @@ const maxReached = quantity >= maxStock;
                 >
                   <button
                     onClick={() => decrementQuantity(product)}
-                    className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition"
+                    className="p-2 sm:p-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                   >
                     <Minus className="w-4 h-4 text-gray-600" />
                   </button>
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm font-semibold text-gray-800 min-w-[24px] text-center">
                     {quantity}
                   </span>
                   <button
                     onClick={() => !maxReached && incrementQuantity(product)}
                     disabled={maxReached}
                     title={maxReached ? "Maximum stock reached" : "Increase quantity"}
-                    className={`p-1.5 rounded-full transition ${
+                    className={`p-2 sm:p-1.5 rounded-full transition touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center ${
                       maxReached
                         ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                         : "bg-gray-100 hover:bg-gray-200 text-gray-600"
@@ -175,7 +175,7 @@ const maxReached = quantity >= maxStock;
               ) : (
                 <button
                   onClick={handleBadgeClick}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-[#E07385] text-white font-semibold text-sm transition hover:scale-105"
+                  className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#E07385] text-white font-semibold text-sm transition hover:scale-105 touch-manipulation"
                 >
                   {quantity}
                 </button>
@@ -183,13 +183,13 @@ const maxReached = quantity >= maxStock;
             ) : (
               <button
                 onClick={handleAddToCart}
-                className="text-sm font-medium rounded-full px-4 py-1 bg-[#E07385] text-white hover:bg-[#d15e72] transition"
+                className="text-sm font-medium rounded-full px-4 sm:px-4 py-2 sm:py-1 bg-[#E07385] text-white hover:bg-[#d15e72] transition touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 Add to Cart
               </button>
             )
           ) : (
-            <div className="text-sm bg-gray-300 text-gray-500 px-4 py-1 rounded-full cursor-not-allowed">
+            <div className="text-sm bg-gray-300 text-gray-500 px-4 py-2 sm:py-1 rounded-full cursor-not-allowed min-h-[44px] sm:min-h-0 flex items-center justify-center">
               Sold Out
             </div>
           )}

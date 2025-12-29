@@ -96,16 +96,16 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
-      <div className="container mx-auto px-2 flex justify-between items-center py-4">
+      <div className="container mx-auto px-2 sm:px-4 flex flex-col sm:flex-row justify-between items-center py-3 sm:py-4 gap-3 sm:gap-0">
         <Link
           to="/"
-          className="text-4xl font-bold text-gray-900 tracking-wide"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-wide"
           style={{ fontFamily: "'Lily Script One', cursive" }}
         >
           Craftopia
         </Link>
 
-        <div className="relative w-1/3">
+        <div className="relative w-full sm:w-1/3 order-3 sm:order-2">
           <input
             type="text"
             value={searchTerm}
@@ -113,16 +113,16 @@ const Navbar = () => {
             onKeyDown={handleSearch}
             onBlur={handleBlur}
             placeholder="Search for artists or products..."
-            className="w-full border border-coral rounded-full px-5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-coral"
+            className="w-full border border-coral rounded-full px-4 sm:px-5 py-2.5 sm:py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-coral"
           />
-          <FaSearch className="absolute right-4 top-2.5 text-gray-600 text-lg" />
+          <FaSearch className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-600 text-base sm:text-lg" />
 
           {suggestions.length > 0 && (
             <ul className="absolute z-50 bg-white border border-gray-200 mt-1 w-full rounded-lg shadow-md max-h-60 overflow-y-auto">
               {suggestions.map((item, idx) => (
                 <li
                   key={idx}
-                  className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                  className="px-4 py-2.5 sm:py-2 text-sm hover:bg-gray-100 cursor-pointer touch-manipulation"
                   onMouseDown={() => handleSuggestionClick(item)}
                 >
                   {item.name || item.username} (
@@ -138,21 +138,21 @@ const Navbar = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-5 text-gray-700 text-2xl">
+        <div className="flex items-center gap-3 sm:gap-5 text-gray-700 text-xl sm:text-2xl order-2 sm:order-3">
           {user?.role === 'customer' && (
             <>
               <AiOutlineHeart
-                className="cursor-pointer hover:text-burgundy transition"
+                className="cursor-pointer hover:text-burgundy transition touch-manipulation min-w-[24px] min-h-[24px]"
                 title="Wishlist"
                 onClick={() => navigate('/wishlist')}
               />
               <FaUserFriends
-                className="cursor-pointer hover:text-burgundy transition"
+                className="cursor-pointer hover:text-burgundy transition touch-manipulation min-w-[24px] min-h-[24px] hidden sm:block"
                 title="Following"
                 onClick={() => navigate('/following')}
               />
               <AiOutlineShoppingCart
-                className="cursor-pointer hover:text-burgundy transition"
+                className="cursor-pointer hover:text-burgundy transition touch-manipulation min-w-[24px] min-h-[24px]"
                 title="Cart"
                 onClick={() => navigate('/cart')}
               />
@@ -160,11 +160,11 @@ const Navbar = () => {
           )}
 
           <div
-            className="flex items-center space-x-2 cursor-pointer hover:text-burgundy transition"
+            className="flex items-center space-x-1 sm:space-x-2 cursor-pointer hover:text-burgundy transition touch-manipulation"
             onClick={() => navigate(getProfileLink())}
           >
-            <FaUser className="text-[1.6rem]" title="Account" />
-            <span className="text-base font-medium">
+            <FaUser className="text-xl sm:text-[1.6rem]" title="Account" />
+            <span className="text-xs sm:text-base font-medium hidden sm:inline">
               {user ? 'My Account' : 'Sign In'}
             </span>
           </div>
@@ -176,13 +176,13 @@ const Navbar = () => {
                 navigate('/');
                 window.location.href = '/';
               }}
-              className="ml-2 px-4 py-2 text-sm border border-coral rounded-md hover:bg-coral hover:text-white transition"
+              className="ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-coral rounded-md hover:bg-coral hover:text-white transition touch-manipulation"
             >
               Logout
             </button>
           ) : (
             <Link to="/register">
-              <button className="ml-2 px-4 py-2 bg-coral text-white rounded-md text-sm hover:bg-burgundy transition">
+              <button className="ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-coral text-white rounded-md text-xs sm:text-sm hover:bg-burgundy transition touch-manipulation">
                 Sign Up
               </button>
             </Link>

@@ -48,26 +48,26 @@ const ShopByCategory = () => {
   };
 
   return (
-    <section className="py-20 bg-cream">
+    <section className="py-12 sm:py-20 bg-cream">
       <div className="container mx-auto px-4 ">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-black/90 mb-4">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
             Shop by Category
           </h2>
-          <p className="text-xl text-burgundy/70 max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-burgundy/70 max-w-2xl mx-auto">
             Explore our curated collection of handcrafted treasures
           </p>
         </motion.div>
 
         {/*Horizontal scrolling */}
         <motion.div
-          className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory px-5 py-5 scrollbar-hide "
+          className="flex gap-4 sm:gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory px-2 sm:px-5 py-5 scrollbar-hide "
           style={{ WebkitOverflowScrolling: 'touch' }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -82,21 +82,21 @@ const ShopByCategory = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ scale: 1.05, rotateY: 5 }}
               viewport={{ once: true }}
-              className="group cursor-pointer snap-center min-w-[280px] max-w-[280px] flex-shrink-0"
+              className="group cursor-pointer snap-center min-w-[240px] sm:min-w-[280px] max-w-[240px] sm:max-w-[280px] flex-shrink-0"
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-coral/10">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-coral/10">
                 <div
-                  className={`w-16 h-16 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300`}
                 >
                   {category.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-burgundy mb-2 group-hover:text-coral transition-colors">
+                <h3 className="text-lg sm:text-xl font-semibold text-burgundy mb-2 group-hover:text-coral transition-colors">
                   {category.name}
                 </h3>
-                <p className="text-burgundy/60 mb-4">{category.productCount} items</p>
+                <p className="text-sm sm:text-base text-burgundy/60 mb-4">{category.productCount} items</p>
                   <motion.div
                     whileHover={{ x: 5 }}
-                    className="flex items-center text-coral font-medium cursor-pointer"
+                    className="flex items-center text-coral font-medium cursor-pointer touch-manipulation text-sm sm:text-base"
                     onClick={() => navigate(`/shop?category=${encodeURIComponent(category.name)}`)}
                   >
                     Browse Collection

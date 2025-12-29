@@ -27,7 +27,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-12 space-y-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-4 py-8 sm:py-12 space-y-12 sm:space-y-16">
         <ProductInfo
           product={{
             ...product,
