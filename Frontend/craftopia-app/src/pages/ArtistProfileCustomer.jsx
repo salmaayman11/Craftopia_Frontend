@@ -83,7 +83,7 @@ const Tabs = ({ children, defaultValue, className = '' }) => {
 
 const TabsList = ({ children, activeTab, setActiveTab, className = '' }) => {
   return (
-    <div className={`inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground grid-cols-4 w-full ${className}`}>
+    <div className={`grid h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full ${className}`}>
       {React.Children.map(children, child =>
         React.cloneElement(child, { activeTab, setActiveTab })
       )}
@@ -483,7 +483,7 @@ const ArtistProfileCustomer = () => {
                     <Users className="h-3 w-3 sm:h-4 sm:w-4 text-burgundy/70" />
                     <span>{artist.stats.followers} followers</span>
                   </div>
-                  <div className="flex items-center space-x-1 text-black/80 hidden sm:flex">
+                  <div className="hidden sm:flex items-center space-x-1 text-black/80">
                     <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-burgundy/70" />
                     <span>{artist.stats.views} views</span>
                   </div>
@@ -535,8 +535,8 @@ const ArtistProfileCustomer = () => {
 
         {/* TABS */}
         <Tabs defaultValue="products" className="space-y-4 sm:space-y-6">
-          <div className="overflow-x-auto scrollbar-hide">
-            <TabsList className="grid w-full grid-cols-5 bg-card min-w-max sm:min-w-0">
+          <div className="overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
+            <TabsList className="grid-cols-5 bg-card">
               <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Products</TabsTrigger>
               <TabsTrigger value="gallery" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Gallery</TabsTrigger>
               <TabsTrigger value="auctionProducts" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation whitespace-nowrap">Auctions</TabsTrigger>
