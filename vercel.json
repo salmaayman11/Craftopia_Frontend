@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd Frontend/craftopia-app && npm ci && npm run build",
+  "outputDirectory": "Frontend/craftopia-app/dist",
+  "installCommand": "cd Frontend/craftopia-app && npm ci",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+

@@ -25,5 +25,9 @@ export default defineConfig({
       'craftopia-frontend-youssefabdellah10-dev.apps.rm3.7wse.p1.openshiftapps.com'
     ]
   },
-  base: process.env.VITE_BASE_PATH || "/craftopia-app"
+  base: process.env.VITE_BASE_PATH || "/",
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+  }
 })
