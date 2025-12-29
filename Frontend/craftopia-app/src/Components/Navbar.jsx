@@ -136,7 +136,7 @@ const Navbar = () => {
           Craftopia
         </Link>
 
-        <div className="relative flex-1 max-w-xs sm:max-w-none sm:w-1/3">
+        <div className="relative flex-1 max-w-xs sm:max-w-2xl sm:w-1/3">
           <input
             type="text"
             value={searchTerm}

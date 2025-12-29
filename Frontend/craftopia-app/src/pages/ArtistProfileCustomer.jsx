@@ -26,7 +26,7 @@ const Card = ({ children, className = '' }) => {
 
 const CardContent = ({ children, className = '' }) => {
   return (
-    <div className={`p-6 ${className}`}>
+    <div className={`p-4 sm:p-6 ${className}`}>
       {children}
     </div>
   );
@@ -436,104 +436,140 @@ const ArtistProfileCustomer = () => {
   return (
     <div className="min-h-screen bg-cream">
       {/* COVER IMAGE */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="relative h-80 overflow-hidden">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="relative h-48 sm:h-64 md:h-80 overflow-hidden">
         <img src={artist.coverImage} alt="Artist cover" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* HEADER */}
-        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative -mt-20 mb-8">
-          <Card className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <img src={artist.avatar} alt={artist.name} className="w-32 h-32 rounded-full object-cover border-4 border-cream shadow-lg" />
-              <div className="flex-1 space-y-4">
-                <div>
-                  <h1 className="text-3xl font-bold text-black font-['Playfair_Display']">{artist.name}</h1>
+        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative -mt-16 sm:-mt-20 mb-6 sm:mb-8">
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+              <div className="flex items-center gap-4 sm:block">
+                <img src={artist.avatar} alt={artist.name} className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-cream shadow-lg flex-shrink-0" />
+                <div className="flex-1 sm:hidden">
+                  <h1 className="text-xl font-bold text-black">{artist.name}</h1>
+                  <div className="flex items-center space-x-1 text-xs text-black/70 mt-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>Joined {artist.joinedDate}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 space-y-3 sm:space-y-4">
+                <div className="hidden sm:block">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-black font-['Playfair_Display']">{artist.name}</h1>
                   <div className="flex items-center space-x-4 text-black/70 mt-2">
                     <div className="flex items-center space-x-1"><Calendar className="h-4 w-4" /><span>Joined {artist.joinedDate}</span></div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {artist.specialties.map(s => <Badge className='bg-white shadow-sm' key={s.categoryId} variant="outline">{s.name}</Badge>)}
+                  {artist.specialties.slice(0, 3).map(s => <Badge className='bg-white shadow-sm text-xs sm:text-sm' key={s.categoryId} variant="outline">{s.name}</Badge>)}
+                  {artist.specialties.length > 3 && (
+                    <Badge className='bg-white shadow-sm text-xs sm:text-sm' variant="outline">
+                      +{artist.specialties.length - 3}
+                    </Badge>
+                  )}
                 </div>
 
-                <div className="flex flex-wrap gap-6 text-sm ">
-                  <div className="flex items-center space-x-1"><Star className="h-4 w-4 text-yellow-400 fill-current" /><span className="font-semibold">{artist.stats.rating}</span><span className="black/70">({artist.stats.reviews} reviews)</span></div>
-                  <div className="flex items-center space-x-1 text-black/80"><Users className="h-4 w-4 text-burgundy/70 " /><span>{artist.stats.followers} followers</span></div>
-                  <div className="flex items-center space-x-1 text-black/80"><Eye className="h-4 w-4 text-burgundy/70 " /><span>{artist.stats.views} profile views</span></div>
+                <div className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-current" />
+                    <span className="font-semibold">{artist.stats.rating}</span>
+                    <span className="text-black/70">({artist.stats.reviews})</span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-black/80">
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 text-burgundy/70" />
+                    <span>{artist.stats.followers} followers</span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-black/80 hidden sm:flex">
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-burgundy/70" />
+                    <span>{artist.stats.views} views</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-3">
+              <div className="flex flex-row sm:flex-col gap-2 sm:gap-3 sm:items-stretch">
                 {!isArtist && !isOwnProfile && (
                   <Button
-                    className="bg-coral hover:bg-coral/90 text-white"
+                    className="bg-coral hover:bg-coral/90 text-white flex-1 sm:flex-none text-sm sm:text-base touch-manipulation min-h-[44px]"
                     onClick={handleToggleFollow}
                   >
-                    {isFollowing ? "following" : "Follow"}
+                    {isFollowing ? "Following" : "Follow"}
                   </Button>
                 )}
-
+                {!isOwnProfile && !isArtist && (
+                  <Button
+                    variant="outline"
+                    className="text-burgundy border border-burgundy hover:bg-burgundy hover:text-white bg-cream flex-1 sm:flex-none text-sm sm:text-base touch-manipulation min-h-[44px]"
+                    onClick={handleOpenReport}
+                  >
+                    Report
+                  </Button>
+                )}
               </div>
-              {!isOwnProfile && !isArtist && (
-                <Button
-                  variant="outline"
-                  className="text-burgundy border border-burgundy hover:bg-burgundy hover:text-white bg-cream"
-                  onClick={handleOpenReport}
-                >
-                  Report Artist
-                </Button>
-              )}
-
             </div>
           </Card>
         </motion.div>
 
         {/* STATS */}
-        <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4 text-center bg-white shadow-sm"><div className="text-2xl font-bold text-coral">{artist.stats.products}</div><div className="text-sm text-burgundy/70">Products</div></Card>
-          <Card className="p-4 text-center bg-white"><div className="text-2xl font-bold text-coral">{artist.stats.sales}</div><div className="text-sm text-burgundy/70">Total Sales</div></Card>
-          <Card className="p-4 text-center bg-white"><div className="text-2xl font-bold text-coral">{artist.stats.rating}</div><div className="text-sm text-burgundy/70">Rating</div></Card>
-          <Card className="p-4 text-center bg-white"><div className="text-2xl font-bold text-coral">{artist.stats.followers}</div><div className="text-sm text-burgundy/70">Followers</div></Card>
+        <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Card className="p-3 sm:p-4 text-center bg-white shadow-sm">
+            <div className="text-xl sm:text-2xl font-bold text-coral">{artist.stats.products}</div>
+            <div className="text-xs sm:text-sm text-burgundy/70">Products</div>
+          </Card>
+          <Card className="p-3 sm:p-4 text-center bg-white">
+            <div className="text-xl sm:text-2xl font-bold text-coral">{artist.stats.sales}</div>
+            <div className="text-xs sm:text-sm text-burgundy/70">Sales</div>
+          </Card>
+          <Card className="p-3 sm:p-4 text-center bg-white">
+            <div className="text-xl sm:text-2xl font-bold text-coral">{artist.stats.rating}</div>
+            <div className="text-xs sm:text-sm text-burgundy/70">Rating</div>
+          </Card>
+          <Card className="p-3 sm:p-4 text-center bg-white">
+            <div className="text-xl sm:text-2xl font-bold text-coral">{artist.stats.followers}</div>
+            <div className="text-xs sm:text-sm text-burgundy/70">Followers</div>
+          </Card>
         </motion.div>
 
         {/* TABS */}
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-card">
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
-            <TabsTrigger value="auctionProducts">Auction Products</TabsTrigger>
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="products" className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto scrollbar-hide">
+            <TabsList className="grid w-full grid-cols-5 bg-card min-w-max sm:min-w-0">
+              <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Products</TabsTrigger>
+              <TabsTrigger value="gallery" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Gallery</TabsTrigger>
+              <TabsTrigger value="auctionProducts" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation whitespace-nowrap">Auctions</TabsTrigger>
+              <TabsTrigger value="about" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Reviews</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* ABOUT TAB */}
-          <TabsContent value="about" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <h3 className="text-xl font-bold text-burgundy mb-4">About Me</h3>
-                <p className="text-burgundy/80 leading-relaxed mb-6">{artist.bio}</p>
+          <TabsContent value="about" className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+              <Card className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-burgundy mb-3 sm:mb-4">About Me</h3>
+                <p className="text-sm sm:text-base text-burgundy/80 leading-relaxed">{artist.bio}</p>
               </Card>
 
-              <Card className="p-6">
-                <h3 className="text-xl font-bold text-burgundy mb-4">Process Video</h3>
-                <div className="aspect-video bg-card rounded-lg overflow-hidden mb-4">
+              <Card className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-burgundy mb-3 sm:mb-4">Process Video</h3>
+                <div className="aspect-video bg-card rounded-lg overflow-hidden mb-3 sm:mb-4">
                   <video controls className="w-full h-full object-cover">
                     <source src={artist.video} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
-                <p className="text-burgundy/80 text-sm">Watch the artist’s creation process and learn their techniques.</p>
+                <p className="text-xs sm:text-sm text-burgundy/80">Watch the artist's creation process and learn their techniques.</p>
               </Card>
             </div>
           </TabsContent>
 
 
-          <TabsContent value="products" className="space-y-6">
-            <h2 className="text-2xl font-bold text-burgundy">Products ({artist.stats.products})</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <TabsContent value="products" className="space-y-4 sm:space-y-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-burgundy">Products ({artist.stats.products})</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {products.filter(p => p.type === 'normal').map((product, index) => (
                 <motion.div
                   key={product.productId || product.id || index}
@@ -566,17 +602,16 @@ const ArtistProfileCustomer = () => {
           </TabsContent>
 
 
-          <TabsContent value="gallery" className="space-y-6">
-            <h2 className="text-2xl font-bold text-burgundy">Gallery</h2>
+          <TabsContent value="gallery" className="space-y-4 sm:space-y-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-burgundy">Gallery</h2>
 
             <div className="mt-4">
-              <div className="flex justify-start gap-6 mb-8">
-
+              <div className="flex justify-start gap-6 mb-6 sm:mb-8">
                 <div>
-                  {loadingProducts && <p className="text-center py-8">Loading products...</p>}
-                  {productsError && <p className="text-red-500 text-center py-4">{productsError}</p>}
+                  {loadingProducts && <p className="text-center py-8 text-sm sm:text-base">Loading products...</p>}
+                  {productsError && <p className="text-red-500 text-center py-4 text-sm sm:text-base">{productsError}</p>}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
                     {galleryProducts.length === 0 && !loadingProducts && (
                       <p className="col-span-full text-gray-500 py-8">No products found in your gallery.</p>
                     )}
@@ -613,13 +648,13 @@ const ArtistProfileCustomer = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="auctionProducts" className="space-y-6">
-            <h2 className="text-2xl font-bold text-burgundy">Auction Products</h2>
+          <TabsContent value="auctionProducts" className="space-y-4 sm:space-y-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-burgundy">Auction Products</h2>
             <div>
-              {loadingProducts && <p className="text-center py-8">Loading auction products...</p>}
-              {productsError && <p className="text-red-500 text-center py-4">{productsError}</p>}
+              {loadingProducts && <p className="text-center py-8 text-sm sm:text-base">Loading auction products...</p>}
+              {productsError && <p className="text-red-500 text-center py-4 text-sm sm:text-base">{productsError}</p>}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                 {auctionProducts.length === 0 && !loadingProducts ? (
                   <p className="col-span-full text-gray-500 py-8">No auction products found.</p>
                 ) : (
@@ -653,56 +688,56 @@ const ArtistProfileCustomer = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="reviews" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-burgundy">
-                Customer Reviews ({artist.stats.reviews})
+          <TabsContent value="reviews" className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-burgundy">
+                Reviews ({artist.stats.reviews})
               </h2>
               <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                <span className="text-xl font-bold text-burgundy">{artist.stats.rating}</span>
-                <span className="text-burgundy/70">average rating</span>
+                <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
+                <span className="text-lg sm:text-xl font-bold text-burgundy">{artist.stats.rating}</span>
+                <span className="text-sm sm:text-base text-burgundy/70">avg rating</span>
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {reviews.length === 0 && (
-                <p className="text-burgundy/60">No reviews yet.</p>
+                <p className="text-sm sm:text-base text-burgundy/60">No reviews yet.</p>
               )}
               {reviews.map((review) => (
-                <Card key={review.id} className="p-6">
-                  <div className="flex items-start space-x-4">
+                <Card key={review.id} className="p-4 sm:p-6">
+                  <div className="flex items-start space-x-3 sm:space-x-4">
                     <img
                       src={review.avatar}
                       alt={review.user}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-medium text-burgundy">{review.user}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <span className="font-medium text-sm sm:text-base text-burgundy truncate">{review.user}</span>
                           {review.verified && (
-                            <Badge variant="outline" className="text-xs">
-                              Verified Purchase
+                            <Badge variant="outline" className="text-xs flex-shrink-0">
+                              Verified
                             </Badge>
                           )}
                         </div>
-                        <span className="text-sm text-burgundy/60">{review.date}</span>
+                        <span className="text-xs sm:text-sm text-burgundy/60">{review.date}</span>
                       </div>
 
-                      <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                              className={`h-3 w-3 sm:h-4 sm:w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                             />
                           ))}
                         </div>
-                        <span className="text-sm text-burgundy/70">for {review.product}</span>
+                        <span className="text-xs sm:text-sm text-burgundy/70">for {review.product}</span>
                       </div>
 
-                      <p className="text-burgundy/80">{review.comment}</p>
+                      <p className="text-sm sm:text-base text-burgundy/80 break-words">{review.comment}</p>
                     </div>
                   </div>
                 </Card>
@@ -713,19 +748,19 @@ const ArtistProfileCustomer = () => {
         </Tabs>
       </div>
       {showReportModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 relative transition-all duration-300">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-4 sm:p-6 relative transition-all duration-300 max-h-[90vh] overflow-y-auto">
             {reportSuccess ? (
-              <div className="text-center py-10">
-                <h2 className="text-xl font-bold text-green-600 mb-3">✅ Report Submitted!</h2>
-                <p className="text-gray-700">Thank you for helping us keep the community safe.</p>
+              <div className="text-center py-8 sm:py-10">
+                <h2 className="text-lg sm:text-xl font-bold text-green-600 mb-3">✅ Report Submitted!</h2>
+                <p className="text-sm sm:text-base text-gray-700">Thank you for helping us keep the community safe.</p>
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-bold text-burgundy mb-4">Report Artist</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-burgundy mb-4">Report Artist</h2>
 
                 <textarea
-                  className="w-full p-3 border rounded-lg bg-white text-sm text-gray-800 mb-4"
+                  className="w-full p-3 border rounded-lg bg-white text-sm text-gray-800 mb-4 resize-none"
                   rows={4}
                   placeholder="Enter your message..."
                   value={reportMessage}
@@ -741,16 +776,16 @@ const ArtistProfileCustomer = () => {
                     className="w-full border rounded-md px-3 py-2 text-sm"
                   />
                   {attachment && (
-                    <p className="text-sm text-gray-600 mt-1">📎 {attachment.name}</p>
+                    <p className="text-sm text-gray-600 mt-1 truncate">📎 {attachment.name}</p>
                   )}
                 </label>
 
-                {reportError && <p className="text-red-500 text-sm mb-2">{reportError}</p>}
-                <div className="flex justify-end gap-3 mt-4">
-                  <Button variant="outline" onClick={() => setShowReportModal(false)}>
+                {reportError && <p className="text-red-500 text-xs sm:text-sm mb-2">{reportError}</p>}
+                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-4">
+                  <Button variant="outline" onClick={() => setShowReportModal(false)} className="w-full sm:w-auto touch-manipulation min-h-[44px]">
                     Cancel
                   </Button>
-                  <Button onClick={handleReportSubmit}>Submit Report</Button>
+                  <Button onClick={handleReportSubmit} className="w-full sm:w-auto touch-manipulation min-h-[44px]">Submit Report</Button>
                 </div>
               </>
             )}
