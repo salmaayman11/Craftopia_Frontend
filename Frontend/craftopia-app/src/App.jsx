@@ -164,11 +164,14 @@ function AppContent() {
 }
 
 export default function App() {
+  
+  const basename = import.meta.env.VITE_BASE_PATH || "/";
+  
   return (
     <AuthProvider>
       <WishlistProvider>
         <CartProvider>
-        <Router basename="/craftopia-app">
+        <Router basename={basename}>
             <ScrollToTop />
             <AppContent />
             <Toaster position="top-center" reverseOrder={false} />
