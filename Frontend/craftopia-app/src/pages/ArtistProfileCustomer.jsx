@@ -499,7 +499,7 @@ const ArtistProfileCustomer = () => {
                 </div>
               </div>
 
-              <div className="flex flex-row sm:flex-col gap-2 sm:gap-3 sm:items-stretch">
+              <div className="flex flex-col sm:flex-row  gap-2 sm:gap-3 sm:items-stretch">
                 {!isArtist && !isOwnProfile && (
                   <Button
                     className="bg-coral hover:bg-coral/90 text-white flex-1 sm:flex-none text-sm sm:text-base touch-manipulation min-h-[44px]"
