@@ -91,9 +91,9 @@ const AvaliableProducts = () => {
           viewport={{ once: true }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
+          <p className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
             Shop Our Available Products
-          </h2>
+          </p>
           <p className="text-base sm:text-xl text-burgundy/80 max-w-2xl mx-auto">
             Browse unique, handmade items crafted by talented artists
           </p>

@@ -50,7 +50,7 @@ const AuctionsSection = () => {
   }, []);
 
   return (
-    <section className="py-24 bg-gradient-cream">
+    <section className="py-12 sm:py-24 bg-gradient-cream">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -58,23 +58,23 @@ const AuctionsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-6">
             <motion.div
               initial={{ rotate: 0 }}
               whileInView={{ rotate: 15 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="p-4 bg-coral/10 rounded-2xl"
+              className="p-3 sm:p-4 bg-coral/10 rounded-2xl"
             >
-              <Gavel className="h-8 w-8 text-coral" />
+              <Gavel className="h-6 w-6 sm:h-8 sm:w-8 text-coral" />
             </motion.div>
           </div>
-          <h2 className="text-5xl md:text-6xl font-light black/90 mb-6">
+          <p className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
             Live <span className="font-bold">Auctions</span>
-          </h2>
-          <p className="text-xl text-burgundy/80 max-w-2xl mx-auto leading-relaxed">
+          </p>
+          <p className="text-base sm:text-xl text-burgundy/80 max-w-2xl mx-auto leading-relaxed">
             Discover and bid on exceptional pieces from the world's most talented artisans
           </p>
         </motion.div>

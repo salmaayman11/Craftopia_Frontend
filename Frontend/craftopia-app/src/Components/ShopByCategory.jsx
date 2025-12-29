@@ -57,9 +57,9 @@ const ShopByCategory = () => {
           viewport={{ once: true }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
+          <p className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
             Shop by Category
-          </h2>
+          </p>
           <p className="text-base sm:text-xl text-burgundy/70 max-w-2xl mx-auto">
             Explore our curated collection of handcrafted treasures
           </p>

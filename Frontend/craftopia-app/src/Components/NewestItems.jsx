@@ -16,8 +16,10 @@ const NewestItems = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-[#FAF9F6] pl-30 mt-12">
-      <h2 className="text-xl font-bold mb-4">Discover Our Newest Handmade Products</h2>
+    <div className="p-4 sm:p-6 bg-[#FAF9F6] pl-4 sm:pl-30 mt-8 sm:mt-12">
+      <div className="text-center mb-6 sm:mb-10">
+        <p className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">Discover Our Newest Handmade Products</p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
@@ -51,7 +53,7 @@ const NewestItems = () => {
       </div>
 
       <div className="flex justify-center mt-6">
-        <button className="bg-[#E07385] text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-[#921A40] transition">
+        <button className="bg-[#E07385] text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-[#921A40] transition touch-manipulation min-h-[44px]">
           SEE MORE
         </button>
       </div>

@@ -64,19 +64,19 @@ const ArtistsSection = () => {
   }, [artists]);
 
   return (
-    <section className="py-20 bg-cream overflow-hidden">
+    <section className="py-12 sm:py-20 bg-cream overflow-hidden">
       <div className="container mx-auto px-4 relative">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-black/90 mb-4">
+          <p className="text-2xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3 sm:mb-4">
             Meet Our Artists
-          </h2>
-          <p className="text-xl text-burgundy/80 max-w-2xl mx-auto">
+          </p>
+          <p className="text-base sm:text-xl text-burgundy/80 max-w-2xl mx-auto">
             Discover the talented creators behind our beautiful handcrafted pieces
           </p>
         </motion.div>
