@@ -92,10 +92,19 @@ const TabsList = ({ children, activeTab, setActiveTab, className = '' }) => {
 };
 
 const TabsTrigger = ({ value, children, activeTab, setActiveTab, className = '' }) => {
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (setActiveTab) {
+      setActiveTab(value);
+    }
+  };
+  
   return (
     <button
-      onClick={() => setActiveTab(value)}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 flex-1 ${activeTab === value ? 'bg-background text-foreground shadow-sm' : ''
+      type="button"
+      onClick={handleClick}
+      className={`flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${activeTab === value ? 'bg-background text-foreground shadow-sm' : ''
         } ${className}`}
     >
       {children}
@@ -535,15 +544,13 @@ const ArtistProfileCustomer = () => {
 
         {/* TABS */}
         <Tabs defaultValue="products" className="space-y-4 sm:space-y-6">
-          <div className="overflow-x-auto scrollbar-hide -mx-3 sm:mx-0 px-3 sm:px-0">
-            <TabsList className="grid-cols-5 bg-card">
-              <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Products</TabsTrigger>
-              <TabsTrigger value="gallery" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Gallery</TabsTrigger>
-              <TabsTrigger value="auctionProducts" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation whitespace-nowrap">Auctions</TabsTrigger>
-              <TabsTrigger value="about" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Reviews</TabsTrigger>
-            </TabsList>
-          </div>
+          <TabsList className="grid-cols-5 bg-card">
+            <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Products</TabsTrigger>
+            <TabsTrigger value="gallery" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Gallery</TabsTrigger>
+            <TabsTrigger value="auctionProducts" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation whitespace-nowrap">Auctions</TabsTrigger>
+            <TabsTrigger value="about" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">About</TabsTrigger>
+            <TabsTrigger value="reviews" className="text-xs sm:text-sm px-2 sm:px-3 touch-manipulation">Reviews</TabsTrigger>
+          </TabsList>
 
           {/* ABOUT TAB */}
           <TabsContent value="about" className="space-y-4 sm:space-y-6">
